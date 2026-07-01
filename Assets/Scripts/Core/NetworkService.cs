@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Diagnostics;
 using FishNet;
 using FishNet.Managing;
 using FishNet.Transporting;
@@ -14,8 +15,6 @@ public class NetworkService : MonoBehaviour
 
     private NetworkManager _networkManager;
     private Transport _transport;
-
-    private Coroutine _switchingScene;
 
     private void Awake()
     {
@@ -64,20 +63,20 @@ public class NetworkService : MonoBehaviour
 
     private void OnServerConnectionState(ServerConnectionStateArgs args)
     {
+        UnityEngine.Debug.Log($"Server state: {args.ConnectionState}");
+
         if (args.ConnectionState == LocalConnectionState.Started)
         {
+            UnityEngine.Debug.Log("Starting LoadGameScene coroutine");
             OnConnected?.Invoke();
-
-            if (_switchingScene != null)
-                return;
-
-            _switchingScene = StartCoroutine(LoadGameScene());
+            StartCoroutine(LoadGameScene());
+            _networkManager.SceneManager.OnLoadEnd += OnSceneLoadEnd;
         }
     }
 
     private void OnClientConnectionState(ClientConnectionStateArgs args)
     {
-        Debug.Log($"Client state: {args.ConnectionState}");
+        UnityEngine.Debug.Log($"Client state: {args.ConnectionState}");
 
         if (args.ConnectionState == LocalConnectionState.Started)
             OnConnected?.Invoke();
@@ -88,17 +87,23 @@ public class NetworkService : MonoBehaviour
 
     private IEnumerator LoadGameScene()
     {
-        ScreenFader.Instance.FadeIn(() => { });
+        ScreenFader.Instance.AutoFadeOut = false;
+        ScreenFader.Instance.FadeIn();
+
         yield return new WaitForSeconds(ScreenFader.Instance.Duration);
 
         var sceneLoadData = new FishNet.Managing.Scened.SceneLoadData("Game");
+        sceneLoadData.ReplaceScenes = FishNet.Managing.Scened.ReplaceOption.All;
         _networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+    }
 
-        yield return new WaitUntil(() =>
-            UnityEngine.SceneManagement.SceneManager.GetSceneByName("Game").isLoaded);
+    private void OnSceneLoadEnd(FishNet.Managing.Scened.SceneLoadEndEventArgs args)
+    {
+        if (args.QueueData.AsServer == false) 
+            return;
 
-        UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync("Menu");
-
+        _networkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
+        ScreenFader.Instance.AutoFadeOut = true;
         ScreenFader.Instance.FadeOut();
     }
 }

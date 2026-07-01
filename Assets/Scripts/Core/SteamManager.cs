@@ -1,5 +1,6 @@
 using UnityEngine;
 using Steamworks;
+using System;
 
 public class SteamManager : MonoBehaviour
 {
@@ -15,11 +16,22 @@ public class SteamManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        try
+        {
+            SteamClient.Init(480);
+            Debug.Log($"Steam initialized: {SteamClient.Name}");
+        }
+        catch (Exception e)
+        { 
+            Debug.Log(e.Message); 
+            Application.Quit();
+        }
     }
 
-    private void Start()
+    private void Update()
     {
-        Debug.Log($"Steam OK: {SteamClient.Name}");
+        SteamClient.RunCallbacks();
     }
 
     private void OnApplicationQuit()

@@ -12,6 +12,7 @@ public class ScreenFader : MonoBehaviour
     [SerializeField] private float _duration = 0.5f;
 
     public float Duration => _duration;
+    public bool AutoFadeOut = true;
 
     private void Awake()
     {
@@ -61,6 +62,9 @@ public class ScreenFader : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "Init") 
+            return;
+
+        if (AutoFadeOut == false) 
             return;
 
         FadeOut();

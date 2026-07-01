@@ -64,7 +64,8 @@ public class MenuUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (LobbyService.Instance == null) return;
+        if (LobbyService.Instance == null) 
+            return;
 
         LobbyService.Instance.OnLobbyCreated -= HandleLobbyCreated;
         LobbyService.Instance.OnLobbyJoined -= HandleLobbyJoined;
@@ -74,6 +75,9 @@ public class MenuUI : MonoBehaviour
 
     private void HandleGameStarted()
     {
+        if (LobbyService.Instance.IsHost)
+            return;
+
         ulong hostId = LobbyService.Instance.GetHostSteamId();
         NetworkService.Instance.StartClient(hostId);
     }

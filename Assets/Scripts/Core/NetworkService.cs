@@ -78,7 +78,13 @@ public class NetworkService : MonoBehaviour
         Debug.Log($"Client state: {args.ConnectionState}");
 
         if (args.ConnectionState == LocalConnectionState.Started)
+        {
             OnConnected?.Invoke();
+            ScreenFader.Instance.FadeIn(() =>
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Game");
+            });
+        }
 
         if (args.ConnectionState == LocalConnectionState.Stopped)
             OnDisconnected?.Invoke();

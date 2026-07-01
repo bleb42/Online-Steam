@@ -22,7 +22,12 @@ public class LobbyService : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null) { Destroy(gameObject); return; }
+        if (Instance != null) 
+        { 
+            Destroy(gameObject); 
+            return; 
+        }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
@@ -63,7 +68,7 @@ public class LobbyService : MonoBehaviour
     {
         var result = await SteamMatchmaking.JoinLobbyAsync(lobbyId);
 
-        if (!result.HasValue)
+        if (result.HasValue == false)
         {
             OnJoinFailed?.Invoke();
             return;
@@ -84,7 +89,8 @@ public class LobbyService : MonoBehaviour
 
     public void StartGame()
     {
-        if (!IsHost) return;
+        if (IsHost == false) 
+            return;
 
         CurrentLobby.SetData("hostSteamId", SteamClient.SteamId.Value.ToString());
         CurrentLobby.SetJoinable(false);
@@ -104,7 +110,8 @@ public class LobbyService : MonoBehaviour
 
     private void HandleLobbyDataChanged(Lobby lobby)
     {
-        if (IsHost) return;
+        if (IsHost) 
+            return;
 
         string hostId = lobby.GetData("hostSteamId");
         if (!string.IsNullOrEmpty(hostId))

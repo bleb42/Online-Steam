@@ -79,6 +79,7 @@ public class MenuUI : MonoBehaviour
             return;
 
         ulong hostId = LobbyService.Instance.GetHostSteamId();
+        Debug.Log($"Connecting to host: {hostId}");
         NetworkService.Instance.StartClient(hostId);
     }
 

@@ -8,10 +8,10 @@ public class SteamManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null) 
-        { 
-            Destroy(gameObject); 
-            return; 
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
         }
 
         Instance = this;
@@ -25,6 +25,9 @@ public class SteamManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        if (NetworkService.Instance != null)
+            NetworkService.Instance.Disconnect();
+
         SteamClient.Shutdown();
     }
 }

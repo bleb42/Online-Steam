@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ScreenFader : MonoBehaviour
@@ -13,25 +12,18 @@ public class ScreenFader : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null) 
-        { 
-            Destroy(gameObject); 
-            return; 
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
         }
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
 
-    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
-    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (scene.name == "Init") 
-            return;
-
-        FadeOut();
+        Color color = _image.color;
+        color.a = 1f;
+        _image.color = color;
     }
 
     public void FadeIn(Action onComplete = null) => StartCoroutine(Fade(0f, 1f, onComplete));

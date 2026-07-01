@@ -15,17 +15,16 @@ public class LobbyService : MonoBehaviour
     public event Action OnLobbyCreated;
     public event Action OnLobbyJoined;
     public event Action OnLobbyLeft;
-    public event Action OnGameStarted;
     public event Action<Friend> OnMemberJoined;
     public event Action<Friend> OnMemberLeft;
     public event Action OnJoinFailed;
 
     private void Awake()
     {
-        if (Instance != null) 
-        { 
-            Destroy(gameObject); 
-            return; 
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
         }
 
         Instance = this;
@@ -36,14 +35,12 @@ public class LobbyService : MonoBehaviour
     {
         SteamMatchmaking.OnLobbyMemberJoined += HandleMemberJoined;
         SteamMatchmaking.OnLobbyMemberLeave += HandleMemberLeft;
-        SteamMatchmaking.OnLobbyDataChanged += HandleLobbyDataChanged;
     }
 
     private void OnDisable()
     {
         SteamMatchmaking.OnLobbyMemberJoined -= HandleMemberJoined;
         SteamMatchmaking.OnLobbyMemberLeave -= HandleMemberLeft;
-        SteamMatchmaking.OnLobbyDataChanged -= HandleLobbyDataChanged;
     }
 
     public async Task CreateLobby(int maxPlayers = 4)
@@ -59,6 +56,7 @@ public class LobbyService : MonoBehaviour
         CurrentLobby = result.Value;
         CurrentLobby.SetPublic();
         CurrentLobby.SetJoinable(true);
+        CurrentLobby.SetData("hostSteamId", SteamClient.SteamId.Value.ToString());
         IsHost = true;
 
         OnLobbyCreated?.Invoke();
@@ -87,12 +85,11 @@ public class LobbyService : MonoBehaviour
         OnLobbyLeft?.Invoke();
     }
 
-    public void StartGame()
+    public void CloseLobby()
     {
-        if (IsHost == false) 
+        if (IsHost == false)
             return;
 
-        CurrentLobby.SetData("hostSteamId", SteamClient.SteamId.Value.ToString());
         CurrentLobby.SetJoinable(false);
     }
 
@@ -107,14 +104,4 @@ public class LobbyService : MonoBehaviour
 
     private void HandleMemberJoined(Lobby lobby, Friend friend) => OnMemberJoined?.Invoke(friend);
     private void HandleMemberLeft(Lobby lobby, Friend friend) => OnMemberLeft?.Invoke(friend);
-
-    private void HandleLobbyDataChanged(Lobby lobby)
-    {
-        if (IsHost) 
-            return;
-
-        string hostId = lobby.GetData("hostSteamId");
-        if (!string.IsNullOrEmpty(hostId))
-            OnGameStarted?.Invoke();
-    }
 }

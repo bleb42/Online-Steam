@@ -1,6 +1,7 @@
 using System;
 using FishNet;
 using FishNet.Managing;
+using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using FishNet.Transporting.Multipass;
 using FishNet.Transporting.Tugboat;
@@ -19,10 +20,10 @@ public class NetworkService : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null) 
-        { 
-            Destroy(gameObject); 
-            return; 
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
         }
 
         Instance = this;
@@ -36,21 +37,23 @@ public class NetworkService : MonoBehaviour
     {
         _networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
         _networkManager.ClientManager.RegisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
+        _networkManager.ClientManager.RegisterBroadcast<FadeInMessage>(OnFadeInReceived);
     }
 
     private void OnDisable()
     {
         _networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
         _networkManager.ClientManager.UnregisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
+        _networkManager.ClientManager.UnregisterBroadcast<FadeInMessage>(OnFadeInReceived);
     }
 
     public void StartHost()
     {
         bool local = PlayerPrefs.GetInt("UseLocalTransport", 0) == 1;
         _multipass.SetClientTransport(local ? (Transport)_networkManager.TransportManager.GetTransport<Tugboat>() : _transport);
+
         _networkManager.ServerManager.StartConnection();
         _networkManager.ClientManager.StartConnection();
-        _networkManager.ServerManager.OnServerConnectionState += OnServerReady;
     }
 
     public void StartClient(ulong hostSteamId)
@@ -74,47 +77,48 @@ public class NetworkService : MonoBehaviour
         _networkManager.ServerManager.StopConnection(true);
     }
 
+    public void BeginGameStart()
+    {
+        _networkManager.ServerManager.Broadcast(new FadeInMessage());
+
+        ScreenFader.Instance.FadeIn(() =>
+        {
+            _networkManager.SceneManager.OnLoadEnd += OnSceneLoadEnd;
+
+            var data = new SceneLoadData("Game");
+            data.ReplaceScenes = ReplaceOption.All;
+            _networkManager.SceneManager.LoadGlobalScenes(data);
+        });
+    }
+
     private void OnClientConnectionState(ClientConnectionStateArgs args)
     {
         if (args.ConnectionState == LocalConnectionState.Started)
-        {
             OnConnected?.Invoke();
-
-            if (_networkManager.IsServerStarted == false)
-                ScreenFader.Instance.FadeIn();
-        }
 
         if (args.ConnectionState == LocalConnectionState.Stopped)
             OnDisconnected?.Invoke();
     }
 
-    private void OnServerReady(ServerConnectionStateArgs args)
-    {
-        if (args.ConnectionState != LocalConnectionState.Started) 
-            return;
-
-        _networkManager.ServerManager.OnServerConnectionState -= OnServerReady;
-        _networkManager.SceneManager.OnLoadEnd += OnSceneLoadEnd;
-
-        ScreenFader.Instance.FadeIn(() =>
-        {
-            var data = new FishNet.Managing.Scened.SceneLoadData("Game");
-            data.ReplaceScenes = FishNet.Managing.Scened.ReplaceOption.All;
-            _networkManager.SceneManager.LoadGlobalScenes(data);
-        });
-    }
-
-    private void OnSceneLoadEnd(FishNet.Managing.Scened.SceneLoadEndEventArgs args)
+    private void OnSceneLoadEnd(SceneLoadEndEventArgs args)
     {
         if (!args.QueueData.AsServer) return;
+
         _networkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
         _networkManager.ServerManager.Broadcast(new FadeOutMessage());
+        ScreenFader.Instance.FadeOut(); // хост открывает себе экран
     }
 
     private void OnFadeOutReceived(FadeOutMessage msg, Channel channel)
     {
         ScreenFader.Instance.FadeOut();
     }
+
+    private void OnFadeInReceived(FadeInMessage msg, Channel channel)
+    {
+        ScreenFader.Instance.FadeIn();
+    }
 }
 
 public struct FadeOutMessage : FishNet.Broadcast.IBroadcast { }
+public struct FadeInMessage : FishNet.Broadcast.IBroadcast { }

@@ -58,29 +58,17 @@ public class MenuUI : MonoBehaviour
         LobbyService.Instance.OnMemberJoined += _ => RefreshPlayersList();
         LobbyService.Instance.OnMemberLeft += _ => RefreshPlayersList();
         LobbyService.Instance.OnJoinFailed += HandleJoinFailed;
-
-        LobbyService.Instance.OnGameStarted += HandleGameStarted;
     }
 
     private void OnDestroy()
     {
-        if (LobbyService.Instance == null) 
+        if (LobbyService.Instance == null)
             return;
 
         LobbyService.Instance.OnLobbyCreated -= HandleLobbyCreated;
         LobbyService.Instance.OnLobbyJoined -= HandleLobbyJoined;
         LobbyService.Instance.OnLobbyLeft -= HandleLobbyLeft;
         LobbyService.Instance.OnJoinFailed -= HandleJoinFailed;
-    }
-
-    private void HandleGameStarted()
-    {
-        if (LobbyService.Instance.IsHost)
-            return;
-
-        ulong hostId = LobbyService.Instance.GetHostSteamId();
-        Debug.Log($"Connecting to host: {hostId}");
-        NetworkService.Instance.StartClient(hostId);
     }
 
     private void OnClickMultiplayer() => ShowPanel(_panelMultiplayer);
@@ -93,12 +81,16 @@ public class MenuUI : MonoBehaviour
 
     private void OnClickCopyId() => GUIUtility.systemCopyBuffer = LobbyService.Instance.GetLobbyId();
 
-    private void OnClickLeave() => LobbyService.Instance.LeaveLobby();
+    private void OnClickLeave()
+    {
+        NetworkService.Instance.Disconnect();
+        LobbyService.Instance.LeaveLobby();
+    }
 
     private void OnClickStartGame()
     {
-        LobbyService.Instance.StartGame();
-        NetworkService.Instance.StartHost();
+        LobbyService.Instance.CloseLobby();
+        NetworkService.Instance.BeginGameStart();
     }
 
     private async void OnClickCreate()
@@ -125,6 +117,8 @@ public class MenuUI : MonoBehaviour
         _lobbyIdText.text = LobbyService.Instance.GetLobbyId();
         _btnStartGame.gameObject.SetActive(true);
         RefreshPlayersList();
+
+        NetworkService.Instance.StartHost();
     }
 
     private void HandleLobbyJoined()
@@ -133,6 +127,9 @@ public class MenuUI : MonoBehaviour
         _lobbyIdText.text = LobbyService.Instance.GetLobbyId();
         _btnStartGame.gameObject.SetActive(false);
         RefreshPlayersList();
+
+        ulong hostId = LobbyService.Instance.GetHostSteamId();
+        NetworkService.Instance.StartClient(hostId);
     }
 
     private void HandleLobbyLeft() => ShowPanel(_panelMain);

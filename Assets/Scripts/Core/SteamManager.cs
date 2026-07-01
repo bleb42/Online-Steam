@@ -16,17 +16,6 @@ public class SteamManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        try
-        {
-            SteamClient.Init(480);
-            Debug.Log($"Steam initialized: {SteamClient.Name}");
-        }
-        catch (Exception e)
-        { 
-            Debug.Log(e.Message); 
-            Application.Quit();
-        }
     }
 
     private void Update()

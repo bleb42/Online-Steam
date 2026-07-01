@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
-using System.Diagnostics;
 using FishNet;
 using FishNet.Managing;
 using FishNet.Transporting;
+using FishNet.Transporting.Multipass;
+using FishNet.Transporting.Tugboat;
 using UnityEngine;
 
 public class NetworkService : MonoBehaviour
@@ -15,6 +15,7 @@ public class NetworkService : MonoBehaviour
 
     private NetworkManager _networkManager;
     private Transport _transport;
+    private Multipass _multipass;
 
     private void Awake()
     {
@@ -26,32 +27,44 @@ public class NetworkService : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         _networkManager = InstanceFinder.NetworkManager;
         _transport = _networkManager.TransportManager.GetTransport<FishyFacepunch.FishyFacepunch>();
+        _multipass = _networkManager.TransportManager.GetTransport<Multipass>();
     }
 
     private void OnEnable()
     {
-        _networkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
         _networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
+        _networkManager.ClientManager.RegisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
     }
 
     private void OnDisable()
     {
-        _networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
         _networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
+        _networkManager.ClientManager.UnregisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
     }
 
     public void StartHost()
     {
+        bool local = PlayerPrefs.GetInt("UseLocalTransport", 0) == 1;
+        _multipass.SetClientTransport(local ? (Transport)_networkManager.TransportManager.GetTransport<Tugboat>() : _transport);
         _networkManager.ServerManager.StartConnection();
         _networkManager.ClientManager.StartConnection();
+        _networkManager.ServerManager.OnServerConnectionState += OnServerReady;
     }
 
     public void StartClient(ulong hostSteamId)
     {
-        _transport.SetClientAddress(hostSteamId.ToString());
+        bool local = PlayerPrefs.GetInt("UseLocalTransport", 0) == 1;
+
+        if (local)
+            _multipass.SetClientTransport<Tugboat>();
+        else
+        {
+            _multipass.SetClientTransport<FishyFacepunch.FishyFacepunch>();
+            _transport.SetClientAddress(hostSteamId.ToString());
+        }
+
         _networkManager.ClientManager.StartConnection();
     }
 
@@ -61,49 +74,47 @@ public class NetworkService : MonoBehaviour
         _networkManager.ServerManager.StopConnection(true);
     }
 
-    private void OnServerConnectionState(ServerConnectionStateArgs args)
-    {
-        UnityEngine.Debug.Log($"Server state: {args.ConnectionState}");
-
-        if (args.ConnectionState == LocalConnectionState.Started)
-        {
-            UnityEngine.Debug.Log("Starting LoadGameScene coroutine");
-            OnConnected?.Invoke();
-            StartCoroutine(LoadGameScene());
-            _networkManager.SceneManager.OnLoadEnd += OnSceneLoadEnd;
-        }
-    }
-
     private void OnClientConnectionState(ClientConnectionStateArgs args)
     {
-        UnityEngine.Debug.Log($"Client state: {args.ConnectionState}");
-
         if (args.ConnectionState == LocalConnectionState.Started)
+        {
             OnConnected?.Invoke();
+
+            if (_networkManager.IsServerStarted == false)
+                ScreenFader.Instance.FadeIn();
+        }
 
         if (args.ConnectionState == LocalConnectionState.Stopped)
             OnDisconnected?.Invoke();
     }
 
-    private IEnumerator LoadGameScene()
+    private void OnServerReady(ServerConnectionStateArgs args)
     {
-        ScreenFader.Instance.AutoFadeOut = false;
-        ScreenFader.Instance.FadeIn();
+        if (args.ConnectionState != LocalConnectionState.Started) 
+            return;
 
-        yield return new WaitForSeconds(ScreenFader.Instance.Duration);
+        _networkManager.ServerManager.OnServerConnectionState -= OnServerReady;
+        _networkManager.SceneManager.OnLoadEnd += OnSceneLoadEnd;
 
-        var sceneLoadData = new FishNet.Managing.Scened.SceneLoadData("Game");
-        sceneLoadData.ReplaceScenes = FishNet.Managing.Scened.ReplaceOption.All;
-        _networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+        ScreenFader.Instance.FadeIn(() =>
+        {
+            var data = new FishNet.Managing.Scened.SceneLoadData("Game");
+            data.ReplaceScenes = FishNet.Managing.Scened.ReplaceOption.All;
+            _networkManager.SceneManager.LoadGlobalScenes(data);
+        });
     }
 
     private void OnSceneLoadEnd(FishNet.Managing.Scened.SceneLoadEndEventArgs args)
     {
-        if (args.QueueData.AsServer == false) 
-            return;
-
+        if (!args.QueueData.AsServer) return;
         _networkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
-        ScreenFader.Instance.AutoFadeOut = true;
+        _networkManager.ServerManager.Broadcast(new FadeOutMessage());
+    }
+
+    private void OnFadeOutReceived(FadeOutMessage msg, Channel channel)
+    {
         ScreenFader.Instance.FadeOut();
     }
 }
+
+public struct FadeOutMessage : FishNet.Broadcast.IBroadcast { }

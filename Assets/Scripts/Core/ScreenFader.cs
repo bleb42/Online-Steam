@@ -11,9 +11,6 @@ public class ScreenFader : MonoBehaviour
     [SerializeField] private Image _image;
     [SerializeField] private float _duration = 0.5f;
 
-    public float Duration => _duration;
-    public bool AutoFadeOut = true;
-
     private void Awake()
     {
         if (Instance != null) 
@@ -26,14 +23,15 @@ public class ScreenFader : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    private void OnDisable()
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (scene.name == "Init") 
+            return;
+
+        FadeOut();
     }
 
     public void FadeIn(Action onComplete = null) => StartCoroutine(Fade(0f, 1f, onComplete));
@@ -57,16 +55,5 @@ public class ScreenFader : MonoBehaviour
         color.a = to;
         _image.color = color;
         onComplete?.Invoke();
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (scene.name == "Init") 
-            return;
-
-        if (AutoFadeOut == false) 
-            return;
-
-        FadeOut();
     }
 }

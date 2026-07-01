@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using FishNet;
 using FishNet.Managing;
 using FishNet.Transporting;
@@ -13,6 +14,8 @@ public class NetworkService : MonoBehaviour
 
     private NetworkManager _networkManager;
     private Transport _transport;
+
+    private Coroutine _switchingScene;
 
     private void Awake()
     {
@@ -61,15 +64,14 @@ public class NetworkService : MonoBehaviour
 
     private void OnServerConnectionState(ServerConnectionStateArgs args)
     {
-        Debug.Log($"Server state: {args.ConnectionState}");
-
         if (args.ConnectionState == LocalConnectionState.Started)
         {
             OnConnected?.Invoke();
-            ScreenFader.Instance.FadeIn(() =>
-            {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Game");
-            });
+
+            if (_switchingScene != null)
+                return;
+
+            _switchingScene = StartCoroutine(LoadGameScene());
         }
     }
 
@@ -78,15 +80,25 @@ public class NetworkService : MonoBehaviour
         Debug.Log($"Client state: {args.ConnectionState}");
 
         if (args.ConnectionState == LocalConnectionState.Started)
-        {
             OnConnected?.Invoke();
-            ScreenFader.Instance.FadeIn(() =>
-            {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Game");
-            });
-        }
 
         if (args.ConnectionState == LocalConnectionState.Stopped)
             OnDisconnected?.Invoke();
+    }
+
+    private IEnumerator LoadGameScene()
+    {
+        ScreenFader.Instance.FadeIn(() => { });
+        yield return new WaitForSeconds(ScreenFader.Instance.Duration);
+
+        var sceneLoadData = new FishNet.Managing.Scened.SceneLoadData("Game");
+        _networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+
+        yield return new WaitUntil(() =>
+            UnityEngine.SceneManagement.SceneManager.GetSceneByName("Game").isLoaded);
+
+        UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync("Menu");
+
+        ScreenFader.Instance.FadeOut();
     }
 }

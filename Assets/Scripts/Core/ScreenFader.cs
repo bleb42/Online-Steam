@@ -11,6 +11,8 @@ public class ScreenFader : MonoBehaviour
     [SerializeField] private Image _image;
     [SerializeField] private float _duration = 0.5f;
 
+    public float Duration => _duration;
+
     private void Awake()
     {
         if (Instance != null) 

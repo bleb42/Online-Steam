@@ -47,7 +47,7 @@ public class LobbyService : MonoBehaviour
     {
         var result = await SteamMatchmaking.CreateLobbyAsync(maxPlayers);
 
-        if (!result.HasValue)
+        if (result.HasValue == false)
         {
             OnJoinFailed?.Invoke();
             return;

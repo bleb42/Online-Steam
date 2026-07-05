@@ -61,7 +61,9 @@ public class NetworkService : MonoBehaviour
         bool local = PlayerPrefs.GetInt("UseLocalTransport", 0) == 1;
 
         if (local)
+        {
             _multipass.SetClientTransport<Tugboat>();
+        }
         else
         {
             _multipass.SetClientTransport<FishyFacepunch.FishyFacepunch>();
@@ -102,11 +104,12 @@ public class NetworkService : MonoBehaviour
 
     private void OnSceneLoadEnd(SceneLoadEndEventArgs args)
     {
-        if (!args.QueueData.AsServer) return;
+        if (args.QueueData.AsServer == false) 
+            return;
 
         _networkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
         _networkManager.ServerManager.Broadcast(new FadeOutMessage());
-        ScreenFader.Instance.FadeOut(); // хост открывает себе экран
+        ScreenFader.Instance.FadeOut();
     }
 
     private void OnFadeOutReceived(FadeOutMessage msg, Channel channel)

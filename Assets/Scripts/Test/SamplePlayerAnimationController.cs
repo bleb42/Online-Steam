@@ -59,7 +59,7 @@ public class SamplePlayerAnimationController : MonoBehaviour
     private readonly int _locomotionStartDirectionHash = Animator.StringToHash("LocomotionStartDirection");
 
     [Header("External Components")]
-    [SerializeField] private SampleCameraController _cameraController;
+    [SerializeField] private CameraController _cameraController;
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private Animator _animator;
     [SerializeField] private CharacterController _controller;

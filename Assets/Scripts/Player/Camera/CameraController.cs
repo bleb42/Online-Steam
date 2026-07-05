@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SampleCameraController : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
     private const int _LAG_DELTA_TIME_ADJUSTMENT = 20;
 
@@ -8,12 +8,13 @@ public class SampleCameraController : MonoBehaviour
     [SerializeField] private GameObject _character;
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private Transform _playerTarget;
+    [SerializeField] private InputReader _inputReader;
 
     [Header("Camera Settings")]
     [SerializeField] private bool _invertCamera;
     [SerializeField] private bool _hideCursor;
     [SerializeField] private float _mouseSensitivity = 5f;
-    [SerializeField] private float _cameraDistance = 5f;
+    [SerializeField] private float _cameraDistance = 2f;
     [SerializeField] private float _cameraHeightOffset;
     [SerializeField] private float _cameraHorizontalOffset;
     [SerializeField] private float _cameraTiltOffset;
@@ -27,7 +28,6 @@ public class SampleCameraController : MonoBehaviour
     [SerializeField] private float _cameraCollisionBuffer = 0.15f;
     [SerializeField] private float _minCameraDistance = 0.2f;
 
-    private InputReader _inputReader;
     private Vector3 _lastPosition;
     private Vector3 _newPosition;
     private float _cameraInversion;
@@ -42,8 +42,6 @@ public class SampleCameraController : MonoBehaviour
     private void Start()
     {
         _camera = gameObject.transform.GetChild(0);
-
-        _inputReader = _character.GetComponent<InputReader>();
 
         if (_hideCursor)
         {

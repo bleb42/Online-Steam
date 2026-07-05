@@ -18,6 +18,7 @@ public class LobbyService : MonoBehaviour
     public event Action<Friend> OnMemberJoined;
     public event Action<Friend> OnMemberLeft;
     public event Action OnJoinFailed;
+    public event Action OnHostLeft;
 
     private void Awake()
     {
@@ -80,6 +81,9 @@ public class LobbyService : MonoBehaviour
 
     public void LeaveLobby()
     {
+        if (IsHost)
+            CloseLobby();
+
         CurrentLobby.Leave();
         IsHost = false;
         OnLobbyLeft?.Invoke();
@@ -103,5 +107,16 @@ public class LobbyService : MonoBehaviour
     public Friend[] GetMembers() => CurrentLobby.Members.ToArray();
 
     private void HandleMemberJoined(Lobby lobby, Friend friend) => OnMemberJoined?.Invoke(friend);
-    private void HandleMemberLeft(Lobby lobby, Friend friend) => OnMemberLeft?.Invoke(friend);
+
+    private void HandleMemberLeft(Lobby lobby, Friend friend)
+    {
+        OnMemberLeft?.Invoke(friend);
+
+        if (IsHost)
+            return;
+
+        ulong hostId = GetHostSteamId();
+        if (friend.Id.Value == hostId)
+            OnHostLeft?.Invoke();
+    }
 }

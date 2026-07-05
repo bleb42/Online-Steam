@@ -261,6 +261,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 4560741421478152811}
   _inputReader: {fileID: 1846106266777058927}
   _cameraController: {fileID: 430981391506477876}
+  _playerController: {fileID: 4800862359099724550}
   _playerCamera: {fileID: 1225638580493009064}
   _audioListener: {fileID: 2318986716593362973}
 --- !u!1 &362876516190478070
@@ -1241,13 +1242,13 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 4560741421478152811}
   _networkObjectCache: {fileID: 4560741421478152811}
   _componentConfiguration: 1
-  _synchronizeParent: 0
+  _synchronizeParent: 1
   _packing:
     Position: 1
     Rotation: 1
     Scale: 0
   _useScaledTime: 1
-  _interpolation: 2
+  _interpolation: 1
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1

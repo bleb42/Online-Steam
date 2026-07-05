@@ -6,6 +6,7 @@ public class PlayerNetworkSetup : NetworkBehaviour
 {
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private CameraController _cameraController;
+    [SerializeField] private PlayerController _playerController;
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private AudioListener _audioListener;
 
@@ -15,6 +16,7 @@ public class PlayerNetworkSetup : NetworkBehaviour
 
         _inputReader.enabled = IsOwner;
         _cameraController.enabled = IsOwner;
+        _playerController.enabled = IsOwner;
 
         if (_playerCamera != null)
             _playerCamera.gameObject.SetActive(IsOwner);

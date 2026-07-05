@@ -15,6 +15,7 @@ public class PlayerMotor : MonoBehaviour
     private const float _ANIMATION_DAMP_TIME = 5f;
 
     private CharacterController _controller;
+    private GameObject _controllerGameObject;
     private Vector3 _targetVelocity;
 
     public float SprintSpeed => _sprintSpeed;
@@ -22,6 +23,7 @@ public class PlayerMotor : MonoBehaviour
     public void Initialize(CharacterController controller)
     {
         _controller = controller;
+        _controllerGameObject = controller.gameObject;
     }
 
     public void UpdateMoveDirection(PlayerLocomotionContext context)
@@ -108,6 +110,9 @@ public class PlayerMotor : MonoBehaviour
 
     public void Move(PlayerLocomotionContext context)
     {
+        if (_controller == null || !_controller.enabled || !_controllerGameObject.activeInHierarchy)
+            return;
+
         _controller.Move(context.Velocity * Time.deltaTime);
     }
 

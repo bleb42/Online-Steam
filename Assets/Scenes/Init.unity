@@ -390,7 +390,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4723c0d3edad10340bd45718dccc2c07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkService
-  _gameStarterPrefab: {fileID: 4713156436670881214, guid: b25c1c73a4a100e49a22b37a90e34e9c, type: 3}
 --- !u!4 &1948905905
 Transform:
   m_ObjectHideFlags: 0
@@ -493,7 +492,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2023589239}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9da90c29836670c49809661c5c09cd5d, type: 3}
   m_Name: 
@@ -575,7 +574,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScreenFader
   _image: {fileID: 752588838}
   _duration: 1
-  AutoFadeOut: 1
 --- !u!114 &2032480574
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -104,22 +104,30 @@ public class NetworkService : MonoBehaviour
 
     private void OnSceneLoadEnd(SceneLoadEndEventArgs args)
     {
-        if (args.QueueData.AsServer == false) 
+        if (args.QueueData.AsServer == false)
             return;
 
         _networkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
-        _networkManager.ServerManager.Broadcast(new FadeOutMessage());
-        ScreenFader.Instance.FadeOut();
+
+        PlayerSpawnManager.Instance.SpawnAllPlayers(_networkManager.ServerManager.Clients.Values);
     }
 
     private void OnFadeOutReceived(FadeOutMessage msg, Channel channel)
     {
+        Debug.Log("[NetworkService] OnFadeOutReceived - starting fade out");
         ScreenFader.Instance.FadeOut();
     }
 
     private void OnFadeInReceived(FadeInMessage msg, Channel channel)
     {
         ScreenFader.Instance.FadeIn();
+    }
+
+    public void FinishGameStart()
+    {
+        Debug.Log("[NetworkService] FinishGameStart called - broadcasting FadeOut");
+        _networkManager.ServerManager.Broadcast(new FadeOutMessage());
+        Debug.Log("[NetworkService] FadeOut broadcast sent");
     }
 }
 

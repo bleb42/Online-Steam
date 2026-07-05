@@ -61,6 +61,8 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+        if (_inputReader == null) { Debug.LogError("[CameraController] _inputReader is NULL"); return; }
+
         float positionalFollowSpeed = 1 / (_positionalCameraLag / _LAG_DELTA_TIME_ADJUSTMENT);
         float rotationalFollowSpeed = 1 / (_rotationalCameraLag / _LAG_DELTA_TIME_ADJUSTMENT);
 

@@ -37,8 +37,6 @@ public class PlayerStanceController : MonoBehaviour
         _inputReader.OnSprintDeactivated += DeactivateSprint;
         _inputReader.OnCrouchActivated += ActivateCrouch;
         _inputReader.OnCrouchDeactivated += DeactivateCrouch;
-        _inputReader.OnAimActivated += ActivateAim;
-        _inputReader.OnAimDeactivated += DeactivateAim;
 
         _subscribed = true;
     }
@@ -55,16 +53,8 @@ public class PlayerStanceController : MonoBehaviour
         _inputReader.OnSprintDeactivated -= DeactivateSprint;
         _inputReader.OnCrouchActivated -= ActivateCrouch;
         _inputReader.OnCrouchDeactivated -= DeactivateCrouch;
-        _inputReader.OnAimActivated -= ActivateAim;
-        _inputReader.OnAimDeactivated -= DeactivateAim;
 
         _subscribed = false;
-    }
-
-    private void ActivateAim()
-    {
-        _context.IsAiming = true;
-        _context.IsStrafing = !_context.IsSprinting;
     }
 
     private void DeactivateAim()

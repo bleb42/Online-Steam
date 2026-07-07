@@ -29,6 +29,7 @@ public class PlayerAnimatorAdapter : MonoBehaviour
     private static readonly int _bodyLookXHash = Animator.StringToHash("BodyLookX");
     private static readonly int _bodyLookYHash = Animator.StringToHash("BodyLookY");
     private static readonly int _locomotionStartDirectionHash = Animator.StringToHash("LocomotionStartDirection");
+    private static readonly int _isHoldingHash = Animator.StringToHash("IsHolding");
 
     private Animator _animator;
 
@@ -79,5 +80,10 @@ public class PlayerAnimatorAdapter : MonoBehaviour
         _animator.SetBool(_isStartingHash, context.IsStarting);
 
         _animator.SetFloat(_locomotionStartDirectionHash, context.LocomotionStartDirection);
+    }
+
+    public void SetHolding(bool isHolding)
+    {
+        _animator.SetBool(_isHoldingHash, isHolding);
     }
 }

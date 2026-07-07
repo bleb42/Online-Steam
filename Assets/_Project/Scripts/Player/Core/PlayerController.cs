@@ -2,7 +2,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerStanceController), typeof(PlayerGroundSensor))]
 [RequireComponent(typeof(PlayerInputProcessor), typeof(PlayerMotor), typeof(PlayerOrientation))]
-[RequireComponent(typeof(PlayerLookAdditives), typeof(PlayerAnimatorAdapter))]
 public class PlayerController : MonoBehaviour
 {
     private enum AnimationState
@@ -251,6 +250,7 @@ public class PlayerController : MonoBehaviour
     private void UpdateCrouchState()
     {
         _groundSensor.UpdateGrounded(_context);
+
         if (!_context.IsGrounded)
         {
             _stance.DeactivateCrouch();

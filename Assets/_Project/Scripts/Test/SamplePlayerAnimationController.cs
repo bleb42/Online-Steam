@@ -171,19 +171,10 @@ public class SamplePlayerAnimationController : MonoBehaviour
         _inputReader.OnSprintDeactivated += DeactivateSprint;
         _inputReader.OnCrouchActivated += ActivateCrouch;
         _inputReader.OnCrouchDeactivated += DeactivateCrouch;
-        _inputReader.OnAimActivated += ActivateAim;
-        _inputReader.OnAimDeactivated += DeactivateAim;
 
         _isStrafing = _alwaysStrafe;
 
         SwitchState(AnimationState.Locomotion);
-    }
-
-    private void ActivateAim()
-    {
-        _isAiming = true;
-
-        _isStrafing = !_isSprinting;
     }
 
     private void DeactivateAim()

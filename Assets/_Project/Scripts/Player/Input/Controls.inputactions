@@ -52,15 +52,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Aim",
-                    "type": "Button",
-                    "id": "e440026d-b50a-4df1-ba03-48302673e522",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Crouch",
                     "type": "Button",
                     "id": "0a2dd0bc-e6ed-4515-b034-169169050ceb",
@@ -82,6 +73,15 @@
                     "name": "Throw",
                     "type": "Button",
                     "id": "f04c4460-42b2-455d-b5d4-8f1f24aea449",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Drop",
+                    "type": "Button",
+                    "id": "aab8204a-4267-4785-a9d8-0e190138f943",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -300,28 +300,6 @@
                 },
                 {
                     "name": "",
-                    "id": "2d594f48-6585-4401-95f6-10f27afb0d84",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard and Mouse",
-                    "action": "Aim",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9f00b84c-77a0-4264-88a7-aa6ace188e6e",
-                    "path": "<Gamepad>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Aim",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "73eda66d-2118-4a22-9d70-18cc9ea08e74",
                     "path": "<Keyboard>/ctrl",
                     "interactions": "",
@@ -361,6 +339,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Throw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a6448fe5-4e89-427d-807b-97508b9b1c33",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

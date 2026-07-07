@@ -10,15 +10,15 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     public bool MovementInputDetected { get; private set; }
 
 
-    public event Action OnAimActivated;
-    public event Action OnAimDeactivated;
     public event Action OnCrouchActivated;
     public event Action OnCrouchDeactivated;
     public event Action OnJumpPerformed;
     public event Action OnSprintActivated;
     public event Action OnSprintDeactivated;
     public event Action OnInteractPerformed;
+    public event Action OnThrowStarted;
     public event Action OnThrowPerformed;
+    public event Action OnDropPerformed;
 
     public event Action OnWalkToggled;
 
@@ -99,19 +99,6 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
         }
     }
 
-    public void OnAim(InputAction.CallbackContext context)
-    {
-        if (context.started)
-        {
-            OnAimActivated?.Invoke();
-        }
-
-        if (context.canceled)
-        {
-            OnAimDeactivated?.Invoke();
-        }
-    }
-
     public void OnInteract(InputAction.CallbackContext context)
     {
         if (!context.performed) 
@@ -122,9 +109,18 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
 
     public void OnThrow(InputAction.CallbackContext context)
     {
-        if (!context.performed) 
+        if (context.started)
+            OnThrowStarted?.Invoke();
+
+        if (context.canceled)
+            OnThrowPerformed?.Invoke();
+    }
+
+    public void OnDrop(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
             return;
 
-        OnThrowPerformed?.Invoke();
+        OnDropPerformed?.Invoke();
     }
 }

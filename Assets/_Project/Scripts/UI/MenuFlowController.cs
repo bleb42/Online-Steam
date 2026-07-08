@@ -46,7 +46,6 @@ public class MenuFlowController : MonoBehaviour
         LobbyService.Instance.OnJoinFailed += HandleJoinFailed;
         LobbyService.Instance.OnHostLeft += HandleHostLeft;
         LobbyService.Instance.OnGameAlreadyStarted += HandleGameAlreadyStarted;
-        LobbyService.Instance.OnGameStarted += HandleGameStarted;
     }
 
     private void OnDestroy()
@@ -60,7 +59,6 @@ public class MenuFlowController : MonoBehaviour
         LobbyService.Instance.OnJoinFailed -= HandleJoinFailed;
         LobbyService.Instance.OnHostLeft -= HandleHostLeft;
         LobbyService.Instance.OnGameAlreadyStarted -= HandleGameAlreadyStarted;
-        LobbyService.Instance.OnGameStarted -= HandleGameStarted;
     }
 
     private async void HandleCreateClicked()
@@ -103,10 +101,7 @@ public class MenuFlowController : MonoBehaviour
         _lobby.SetLobbyId(LobbyService.Instance.GetLobbyId());
         _lobby.ShowStartButton(false);
         RefreshPlayersList();
-    }
 
-    private void HandleGameStarted()
-    {
         ulong hostId = LobbyService.Instance.GetHostSteamId();
         NetworkService.Instance.StartClient(hostId);
     }

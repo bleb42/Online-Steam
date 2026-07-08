@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private Transform _playerTarget;
     [SerializeField] private InputReader _inputReader;
+    [SerializeField] private PlayerHand _playerHand;
 
     [Header("Camera Settings")]
     [SerializeField] private bool _invertCamera;
@@ -28,6 +29,13 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float _cameraCollisionBuffer = 0.15f;
     [SerializeField] private float _minCameraDistance = 0.2f;
 
+    [Header("Aim Zoom")]
+    [SerializeField] private float _aimCameraDistance = 3.5f;
+    [SerializeField] private float _aimHeightOffset = 0.3f;
+    [SerializeField] private float _aimHorizontalOffset = 0.5f;
+    [SerializeField] private float _aimFovOffset = 0f;
+    [SerializeField] private float _aimTransitionSpeed = 8f;
+
     private Vector3 _lastPosition;
     private Vector3 _newPosition;
     private float _cameraInversion;
@@ -38,6 +46,11 @@ public class CameraController : MonoBehaviour
     private float _rotationX;
     private float _rotationY;
     private Transform _camera;
+
+    private float _currentCameraDistance;
+    private float _currentHeightOffset;
+    private float _currentHorizontalOffset;
+    private float _baseFov;
 
     private void Start()
     {
@@ -56,6 +69,11 @@ public class CameraController : MonoBehaviour
 
         _lastPosition = transform.position;
 
+        _currentCameraDistance = _cameraDistance;
+        _currentHeightOffset = _cameraHeightOffset;
+        _currentHorizontalOffset = _cameraHorizontalOffset;
+        _baseFov = _mainCamera.fieldOfView;
+
         UpdateCameraCollision();
     }
 
@@ -67,7 +85,6 @@ public class CameraController : MonoBehaviour
         float rotationalFollowSpeed = 1 / (_rotationalCameraLag / _LAG_DELTA_TIME_ADJUSTMENT);
 
         _rotationX = _inputReader.MouseDelta.y * _cameraInversion * _mouseSensitivity;
-
         _rotationY = _inputReader.MouseDelta.x * _mouseSensitivity;
 
         _newAngleX += _rotationX;
@@ -83,6 +100,7 @@ public class CameraController : MonoBehaviour
         transform.position = _newPosition;
         transform.eulerAngles = new Vector3(_newAngleX, _newAngleY, 0);
 
+        UpdateAimZoom();
         UpdateCameraCollision();
 
         _lastPosition = _newPosition;
@@ -90,9 +108,28 @@ public class CameraController : MonoBehaviour
         _lastAngleY = _newAngleY;
     }
 
+    private void UpdateAimZoom()
+    {
+        bool isAiming = _playerHand != null && !_playerHand.IsEmpty && _playerHand.IsAiming;
+
+        float targetDistance = isAiming ? _aimCameraDistance : _cameraDistance;
+        float targetHeight = isAiming ? _cameraHeightOffset + _aimHeightOffset : _cameraHeightOffset;
+        float targetHorizontal = isAiming ? _cameraHorizontalOffset + _aimHorizontalOffset : _cameraHorizontalOffset;
+
+        _currentCameraDistance = Mathf.Lerp(_currentCameraDistance, targetDistance, _aimTransitionSpeed * Time.deltaTime);
+        _currentHeightOffset = Mathf.Lerp(_currentHeightOffset, targetHeight, _aimTransitionSpeed * Time.deltaTime);
+        _currentHorizontalOffset = Mathf.Lerp(_currentHorizontalOffset, targetHorizontal, _aimTransitionSpeed * Time.deltaTime);
+
+        if (_aimFovOffset != 0f)
+        {
+            float targetFov = isAiming ? _baseFov + _aimFovOffset : _baseFov;
+            _mainCamera.fieldOfView = Mathf.Lerp(_mainCamera.fieldOfView, targetFov, _aimTransitionSpeed * Time.deltaTime);
+        }
+    }
+
     private void UpdateCameraCollision()
     {
-        Vector3 desiredLocalPosition = new Vector3(_cameraHorizontalOffset, _cameraHeightOffset, -_cameraDistance);
+        Vector3 desiredLocalPosition = new Vector3(_currentHorizontalOffset, _currentHeightOffset, -_currentCameraDistance);
         Vector3 desiredWorldPosition = transform.TransformPoint(desiredLocalPosition);
 
         Vector3 direction = desiredWorldPosition - transform.position;

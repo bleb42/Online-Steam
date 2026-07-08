@@ -107,13 +107,13 @@ public class LobbyService : MonoBehaviour
         var members = result.Value.Members.ToArray();
         Debug.Log($"[LobbyService] Members count = {members.Length}");
 
-        if (members.Length <= 1)
-        {
-            Debug.LogWarning("[LobbyService] members.Length <= 1 — leaving");
-            result.Value.Leave();
-            OnJoinFailed?.Invoke();
-            return;
-        }
+        //if (members.Length <= 1)
+        //{
+        //    Debug.LogWarning("[LobbyService] members.Length <= 1 — leaving");
+        //    result.Value.Leave();
+        //    OnJoinFailed?.Invoke();
+        //    return;
+        //}
 
         CurrentLobby = result.Value;
         IsHost = false;
@@ -173,11 +173,18 @@ public class LobbyService : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        if (IsHost)
+        if (!IsHost)
+            return;
+
+        try
         {
             CurrentLobby.SetData("gameStarted", "false");
             CurrentLobby.SetJoinable(false);
             CurrentLobby.Leave();
+        }
+        catch (Exception)
+        {
+            // Steam client already shutting down — safe to ignore here
         }
     }
 }

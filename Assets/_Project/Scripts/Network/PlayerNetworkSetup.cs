@@ -19,6 +19,7 @@ public class PlayerNetworkSetup : NetworkBehaviour
 
         if (_playerCamera != null)
             _playerCamera.gameObject.SetActive(IsOwner);
+
         if (_audioListener != null)
             _audioListener.enabled = IsOwner;
 

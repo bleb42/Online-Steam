@@ -420,7 +420,7 @@ GameObject:
   - component: {fileID: 2023589246}
   - component: {fileID: 2023589245}
   - component: {fileID: 2023589244}
-  - component: {fileID: 2023589248}
+  - component: {fileID: 2023589249}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -541,7 +541,7 @@ MonoBehaviour:
   _transports:
   - {fileID: 2023589245}
   - {fileID: 2023589246}
---- !u!114 &2023589248
+--- !u!114 &2023589249
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -550,16 +550,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2023589239}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0962ead4b02a34aae248fccce671ce, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d331f979d46e8e4a9fc90070c596d44, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Managing.Debugging.DebugManager
-  WriteSceneObjectDetails: 1
-  ValidateRpcLengths: 0
-  DisableObserversRpcLinks: 0
-  DisableTargetRpcLinks: 0
-  DisableServerRpcLinks: 0
-  DisableReplicateRpcLinks: 0
-  DisableReconcileRpcLinks: 0
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Managing.Observing.ObserverManager
+  _useLevelOfDetail: 0
+  _maximumLevelOfDetailInterval: 2
+  _levelOfDetailUpdateDuration: 1
+  _levelOfDetailDistances: []
+  _updateHostVisibility: 1
+  _maximumTimedObserversDuration: 10
+  _defaultConditions:
+  - {fileID: 11400000, guid: 35f5513a403985e4bb0cc68cf60c34ca, type: 2}
 --- !u!1 &2032480572
 GameObject:
   m_ObjectHideFlags: 0

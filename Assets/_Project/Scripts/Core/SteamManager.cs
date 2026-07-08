@@ -1,6 +1,5 @@
 using UnityEngine;
 using Steamworks;
-using System;
 
 public class SteamManager : MonoBehaviour
 {

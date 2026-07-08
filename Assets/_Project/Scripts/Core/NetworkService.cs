@@ -18,6 +18,8 @@ public class NetworkService : MonoBehaviour
     private Transport _transport;
     private Multipass _multipass;
 
+    private bool _connectionStarted;
+
     private void Awake()
     {
         if (Instance != null)
@@ -54,7 +56,9 @@ public class NetworkService : MonoBehaviour
 
         _networkManager.ServerManager.StartConnection();
         _networkManager.ClientManager.StartConnection();
+        _connectionStarted = true;
     }
+
 
     public void StartClient(ulong hostSteamId)
     {
@@ -71,15 +75,19 @@ public class NetworkService : MonoBehaviour
         }
 
         _networkManager.ClientManager.StartConnection();
+        _connectionStarted = true;
     }
 
     public void Disconnect()
     {
+        if (!_connectionStarted)
+            return;
+
         _networkManager.ClientManager.StopConnection();
         _networkManager.ServerManager.StopConnection(true);
     }
 
-    public void BeginGameStart()
+    public void BeginGameStart(string sceneName)
     {
         _networkManager.ServerManager.Broadcast(new FadeInMessage());
 
@@ -87,7 +95,7 @@ public class NetworkService : MonoBehaviour
         {
             _networkManager.SceneManager.OnLoadEnd += OnSceneLoadEnd;
 
-            var data = new SceneLoadData("Game");
+            var data = new SceneLoadData(sceneName);
             data.ReplaceScenes = ReplaceOption.All;
             _networkManager.SceneManager.LoadGlobalScenes(data);
         });

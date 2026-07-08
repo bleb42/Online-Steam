@@ -1,17 +1,27 @@
+using FishNet.Component.Transforming;
+using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody), typeof(Outline))]
-public abstract class TakeableItem : MonoBehaviour, ITakeable
+public abstract class TakeableItem : NetworkBehaviour, ITakeable
 {
     [SerializeField] protected ItemData _data;
     [SerializeField] protected Collider _physicalCollider;
+    [SerializeField] private NetworkTransform _networkTransform;
 
     protected Rigidbody _rigidbody;
     protected Outline _outline;
-    protected PlayerHand _hand;
 
+    private readonly SyncVar<bool> _isHeld = new SyncVar<bool>();
+    private readonly SyncVar<NetworkObject> _holderObject = new SyncVar<NetworkObject>();
+
+    private NetworkConnection _holderConnection;
     private int _usesLeft;
     private RigidbodyInterpolation _defaultInterpolation;
+
+    public bool IsHeld => _isHeld.Value;
 
     protected virtual void Awake()
     {
@@ -22,8 +32,29 @@ public abstract class TakeableItem : MonoBehaviour, ITakeable
         _defaultInterpolation = _rigidbody.interpolation;
     }
 
+    private void OnEnable()
+    {
+        _isHeld.OnChange += OnHeldChanged;
+        _holderObject.OnChange += OnHolderChanged;
+    }
+
+    private void OnDisable()
+    {
+        _isHeld.OnChange -= OnHeldChanged;
+        _holderObject.OnChange -= OnHolderChanged;
+    }
+
+    public override void OnStartNetwork()
+    {
+        base.OnStartNetwork();
+        _rigidbody.isKinematic = !IsServerStarted;
+    }
+
     public bool CanInteract(PlayerHand hand)
     {
+        if (_isHeld.Value)
+            return false;
+
         if (!hand.IsEmpty)
             return false;
 
@@ -33,15 +64,114 @@ public abstract class TakeableItem : MonoBehaviour, ITakeable
         return CanInteractInternal(hand);
     }
 
-    public void Interact(PlayerHand hand)
+    public void RequestInteract(PlayerHand hand)
     {
-        _hand = hand;
+        RequestPickupServerRpc(hand.NetworkObject);
+    }
 
-        _rigidbody.interpolation = RigidbodyInterpolation.None;
+    public void RequestUse(Vector3 throwDirection, float throwForce)
+    {
+        RequestUseServerRpc(throwDirection, throwForce);
+    }
+
+    public void RequestDrop()
+    {
+        RequestDropServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestPickupServerRpc(NetworkObject holderNetworkObject, NetworkConnection sender = null)
+    {
+        if (_isHeld.Value)
+            return;
+
+        _isHeld.Value = true;
+        _holderObject.Value = holderNetworkObject;
+        _holderConnection = sender;
+
+        _rigidbody.linearVelocity = Vector3.zero;
+        _rigidbody.angularVelocity = Vector3.zero;
         _rigidbody.isKinematic = true;
         _physicalCollider.isTrigger = true;
+    }
 
-        transform.SetParent(hand.transform);
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestUseServerRpc(Vector3 direction, float force, NetworkConnection sender = null)
+    {
+        if (!_isHeld.Value || _holderConnection != sender)
+            return;
+
+        if (_data.MaxUses > 0)
+            _usesLeft--;
+
+        ReleaseFromHand();
+
+        _rigidbody.isKinematic = false;
+        _rigidbody.linearVelocity = direction.normalized * force;
+
+        OnUsedServer();
+        ObserversRpcUsedEffect();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestDropServerRpc(NetworkConnection sender = null)
+    {
+        if (!_isHeld.Value || _holderConnection != sender)
+            return;
+
+        ReleaseFromHand();
+        _rigidbody.isKinematic = false;
+        OnDroppedServer();
+    }
+
+    private void ReleaseFromHand()
+    {
+        _isHeld.Value = false;
+        _holderObject.Value = null;
+        _holderConnection = null;
+        _physicalCollider.isTrigger = false;
+    }
+
+    private void OnHeldChanged(bool oldValue, bool newValue, bool asServer)
+    {
+        if (!newValue)
+        {
+            transform.SetParent(null, true);
+
+            if (_networkTransform != null)
+                _networkTransform.enabled = true;
+
+            if (!IsServerStarted)
+                _rigidbody.isKinematic = true;
+        }
+        else
+        {
+            if (_networkTransform != null)
+                _networkTransform.enabled = false;
+        }
+    }
+
+    private void OnHolderChanged(NetworkObject oldValue, NetworkObject newValue, bool asServer)
+    {
+        if (newValue == null)
+            return;
+
+        var hand = newValue.GetComponentInChildren<PlayerHand>();
+
+        if (hand == null)
+        {
+            Debug.LogError("[TakeableItem] PlayerHand component not found in children of holder NetworkObject!");
+            return;
+        }
+
+        if (hand.HoldPoint == null)
+        {
+            Debug.LogError("[TakeableItem] hand.HoldPoint is null — assign _holdPoint in PlayerHand inspector!");
+            return;
+        }
+
+        _rigidbody.interpolation = RigidbodyInterpolation.None;
+        transform.SetParent(hand.HoldPoint, false);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
 
@@ -49,34 +179,17 @@ public abstract class TakeableItem : MonoBehaviour, ITakeable
         OnPickedUp();
     }
 
-    public void Use()
+    [ObserversRpc]
+    private void ObserversRpcUsedEffect()
     {
-        if (_data.MaxUses > 0)
-            _usesLeft--;
-
-        Detach();
         OnUsed();
-    }
-
-    public void Drop()
-    {
-        Detach();
-        OnDropped();
     }
 
     public void SetHighlighted(bool isHighlighted) => _outline.enabled = isHighlighted;
 
-    private void Detach()
-    {
-        transform.SetParent(null);
-        _physicalCollider.isTrigger = false;
-        _rigidbody.isKinematic = false;
-        _rigidbody.interpolation = _defaultInterpolation;
-        _hand = null;
-    }
-
     protected virtual bool CanInteractInternal(PlayerHand hand) => true;
     protected virtual void OnPickedUp() { }
+    protected virtual void OnUsedServer() { }
     protected virtual void OnUsed() { }
-    protected virtual void OnDropped() { }
+    protected virtual void OnDroppedServer() { }
 }

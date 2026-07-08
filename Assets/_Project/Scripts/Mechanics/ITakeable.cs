@@ -1,5 +1,7 @@
+using UnityEngine;
+
 public interface ITakeable : IInteractable
 {
-    void Use();
-    void Drop();
+    void RequestUse(Vector3 throwDirection, float throwForce);
+    void RequestDrop();
 }

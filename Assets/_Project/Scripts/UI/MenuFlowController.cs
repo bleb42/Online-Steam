@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class MenuFlowController : MonoBehaviour
 {
+    private const string GameSceneHash = "Game";
+
     [SerializeField] private PanelRouter _router;
 
     [SerializeField] private MainMenuPanel _mainMenu;
@@ -49,7 +51,8 @@ public class MenuFlowController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (LobbyService.Instance == null) return;
+        if (LobbyService.Instance == null) 
+            return;
 
         LobbyService.Instance.OnLobbyCreated -= HandleLobbyCreated;
         LobbyService.Instance.OnLobbyJoined -= HandleLobbyJoined;
@@ -75,7 +78,7 @@ public class MenuFlowController : MonoBehaviour
     private void HandleStartGameClicked()
     {
         LobbyService.Instance.CloseLobby();
-        NetworkService.Instance.BeginGameStart();
+        NetworkService.Instance.BeginGameStart(GameSceneHash);
     }
 
     private void HandleLeaveClicked()

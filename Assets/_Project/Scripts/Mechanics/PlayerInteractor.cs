@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using FishNet.Object;
 using UnityEngine;
 
-public class PlayerInteractor : MonoBehaviour
+public class PlayerInteractor : NetworkBehaviour
 {
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private PlayerHand _hand;
@@ -9,11 +10,31 @@ public class PlayerInteractor : MonoBehaviour
     private readonly List<IInteractable> _nearby = new();
     private IInteractable _currentInteractable;
 
-    private void OnEnable() => _inputReader.OnInteractPerformed += TryInteract;
-    private void OnDisable() => _inputReader.OnInteractPerformed -= TryInteract;
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        if (!IsOwner) 
+            return;
+
+        _inputReader.OnInteractPerformed += TryInteract;
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+
+        if (_inputReader == null) 
+            return;
+
+        _inputReader.OnInteractPerformed -= TryInteract;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!IsOwner) 
+            return;
+
         if (other.TryGetComponent(out IInteractable interactable))
         {
             _nearby.Add(interactable);
@@ -23,6 +44,8 @@ public class PlayerInteractor : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (!IsOwner) return;
+
         if (other.TryGetComponent(out IInteractable interactable))
         {
             _nearby.Remove(interactable);
@@ -53,10 +76,10 @@ public class PlayerInteractor : MonoBehaviour
 
     private void TryInteract()
     {
-        if (_currentInteractable == null) 
+        if (_currentInteractable == null)
             return;
 
-        _currentInteractable.Interact(_hand);
+        _currentInteractable.RequestInteract(_hand);
         UpdateCurrent();
     }
 }

@@ -49,15 +49,20 @@ public class LobbyService : MonoBehaviour
 
     public async Task CreateLobby(int maxPlayers = 4)
     {
+        Debug.Log("[LobbyService] CreateLobby called");
+
         var result = await SteamMatchmaking.CreateLobbyAsync(maxPlayers);
 
-        if (!result.HasValue) 
-        { 
-            OnJoinFailed?.Invoke(); 
-            return; 
+        if (!result.HasValue)
+        {
+            Debug.LogWarning("[LobbyService] CreateLobbyAsync returned null — failed to create lobby");
+            OnJoinFailed?.Invoke();
+            return;
         }
 
         CurrentLobby = result.Value;
+        Debug.Log($"[LobbyService] Lobby created, Id={CurrentLobby.Id.Value}, Owner={CurrentLobby.Owner.Id.Value}, SteamId={SteamClient.SteamId.Value}");
+
         CurrentLobby.SetPublic();
         CurrentLobby.SetJoinable(true);
         CurrentLobby.SetData("hostSteamId", SteamClient.SteamId.Value.ToString());
@@ -68,16 +73,22 @@ public class LobbyService : MonoBehaviour
 
     public async Task JoinLobby(ulong lobbyId)
     {
+        Debug.Log($"[LobbyService] JoinLobby called with id={lobbyId}, my SteamId={SteamClient.SteamId.Value}");
+
         var result = await SteamMatchmaking.JoinLobbyAsync(lobbyId);
 
-        if (!result.HasValue) 
-        { 
-            OnJoinFailed?.Invoke(); 
-            return; 
+        if (!result.HasValue)
+        {
+            Debug.LogWarning("[LobbyService] JoinLobbyAsync returned null — lobby not found or join failed");
+            OnJoinFailed?.Invoke();
+            return;
         }
+
+        Debug.Log($"[LobbyService] Joined lobby raw result, Id={result.Value.Id.Value}, Owner={result.Value.Owner.Id.Value}, MemberCount={result.Value.MemberCount}");
 
         if (result.Value.GetData("gameStarted") == "true")
         {
+            Debug.LogWarning("[LobbyService] gameStarted == true, leaving");
             result.Value.Leave();
             OnGameAlreadyStarted?.Invoke();
             return;
@@ -87,15 +98,18 @@ public class LobbyService : MonoBehaviour
 
         if (owner.Id.Value == 0)
         {
+            Debug.LogWarning("[LobbyService] owner.Id.Value == 0 — invalid owner, leaving");
             result.Value.Leave();
             OnJoinFailed?.Invoke();
             return;
         }
 
         var members = result.Value.Members.ToArray();
+        Debug.Log($"[LobbyService] Members count = {members.Length}");
 
         if (members.Length <= 1)
         {
+            Debug.LogWarning("[LobbyService] members.Length <= 1 — leaving");
             result.Value.Leave();
             OnJoinFailed?.Invoke();
             return;
@@ -103,6 +117,7 @@ public class LobbyService : MonoBehaviour
 
         CurrentLobby = result.Value;
         IsHost = false;
+        Debug.Log("[LobbyService] JoinLobby successful");
         OnLobbyJoined?.Invoke();
     }
 

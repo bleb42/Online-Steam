@@ -74,6 +74,8 @@ public class MenuFlowController : MonoBehaviour
         int expected = LobbyService.Instance.CurrentLobby.MemberCount;
         int connected = NetworkService.Instance.GetConnectedClientCount();
 
+        Debug.Log($"[MenuFlowController] StartButton check: expected={expected}, connected={connected}");
+
         _lobby.SetStartButtonInteractable(connected >= expected);
     }
 

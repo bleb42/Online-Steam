@@ -27,8 +27,6 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
 
     private void OnEnable()
     {
-        Debug.Log("[InputReader] OnEnable called");
-
         if (_controls == null)
         {
             _controls = new Controls();
@@ -40,7 +38,6 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
 
     public void OnDisable()
     {
-        Debug.Log("[InputReader] OnDisable called");
         _controls.Player.Disable();
     }
 

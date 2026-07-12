@@ -1,24 +1,25 @@
 using System.Collections;
 using FishNet;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 
 public class Bomb : TakeableItem
 {
     [SerializeField] private float _explodeDelay = 3f;
 
-    private bool _fuseStarted;
+    private readonly SyncVar<bool> _fuseStarted = new SyncVar<bool>();
 
     protected override bool CanInteractInternal(PlayerHand hand)
     {
-        return !_fuseStarted;
+        return !_fuseStarted.Value;
     }
 
     protected override void OnUsedServer()
     {
-        if (_fuseStarted)
+        if (_fuseStarted.Value)
             return;
 
-        _fuseStarted = true;
+        _fuseStarted.Value = true;
         StartCoroutine(FuseCoroutine());
     }
 

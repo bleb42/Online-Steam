@@ -198,7 +198,7 @@ MonoBehaviour:
   <AssetPathHash>k__BackingField: 2614811313640204228
   SceneId: 0
   SerializedTransformProperties:
-    Position: {x: 0.1, y: 0.5, z: 4.03}
+    Position: {x: -1.75, y: 0.5, z: 4.03}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     Scale: {x: 0.65, y: 0.65, z: 0.65}
     IsValid: 1
@@ -209,8 +209,8 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 4166460952912234361}
+  - {fileID: 364132638575821347}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -221,7 +221,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584180653854292116
+  _initializedTimestamp: -8584177848364655799
 --- !u!114 &4166460952912234361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,9 +301,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45e73281604ce7d429b0f90472959696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bomb
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 6391938029189503166}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 6391938029189503166}
   _data: {fileID: 11400000, guid: 93767eebc7c8e274eaf02739a2451ee7, type: 2}
   _physicalCollider: {fileID: 8043818911000461703}
   _networkTransform: {fileID: 4166460952912234361}

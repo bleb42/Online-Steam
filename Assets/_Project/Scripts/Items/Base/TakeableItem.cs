@@ -82,7 +82,12 @@ public abstract class TakeableItem : NetworkBehaviour, ITakeable
     [ServerRpc(RequireOwnership = false)]
     private void RequestPickupServerRpc(NetworkObject holderNetworkObject, NetworkConnection sender = null)
     {
-        if (_isHeld.Value)
+        if (holderNetworkObject == null)
+            return;
+
+        var hand = holderNetworkObject.GetComponentInChildren<PlayerHand>();
+
+        if (hand == null || !CanInteract(hand))
             return;
 
         _isHeld.Value = true;
@@ -156,6 +161,12 @@ public abstract class TakeableItem : NetworkBehaviour, ITakeable
 
     private void OnHolderChanged(NetworkObject oldValue, NetworkObject newValue, bool asServer)
     {
+        if (oldValue != null)
+        {
+            var previousHand = oldValue.GetComponentInChildren<PlayerHand>();
+            previousHand?.Clear();
+        }
+
         if (newValue == null)
             return;
 

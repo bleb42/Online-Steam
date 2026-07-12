@@ -193,12 +193,12 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 1
+  <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 1129611364744096660
   SceneId: 0
   SerializedTransformProperties:
-    Position: {x: 0.1, y: 0.5, z: 4.03}
+    Position: {x: 3.25, y: 0.5, z: 4.03}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     Scale: {x: 0.65, y: 0.65, z: 0.65}
     IsValid: 1
@@ -209,8 +209,8 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 4087428149027206389}
+  - {fileID: 1012407822473798796}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -221,7 +221,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584180653854292116
+  _initializedTimestamp: -8584177848364655799
 --- !u!114 &4087428149027206389
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,9 +280,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c4221fb91307040b1c943619611ced, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Throwable
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 8184604893175420591}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 8184604893175420591}
   _data: {fileID: 11400000, guid: 70993a4fb5ee39749b99edcc1f25f1fe, type: 2}
   _physicalCollider: {fileID: 6532807895977034248}
   _networkTransform: {fileID: 4087428149027206389}

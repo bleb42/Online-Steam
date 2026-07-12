@@ -23,10 +23,10 @@ public class LobbyService : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null) 
-        { 
-            Destroy(gameObject); 
-            return; 
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
         }
 
         Instance = this;
@@ -49,8 +49,6 @@ public class LobbyService : MonoBehaviour
 
     public async Task CreateLobby(int maxPlayers = 4)
     {
-        Debug.Log("[LobbyService] CreateLobby called");
-
         var result = await SteamMatchmaking.CreateLobbyAsync(maxPlayers);
 
         if (!result.HasValue)
@@ -84,40 +82,40 @@ public class LobbyService : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[LobbyService] Joined lobby raw result, Id={result.Value.Id.Value}, Owner={result.Value.Owner.Id.Value}, MemberCount={result.Value.MemberCount}");
+        Lobby lobby = result.Value;
 
-        if (result.Value.GetData("gameStarted") == "true")
+        Debug.Log($"[LobbyService] Joined lobby, Id={lobby.Id.Value}, Owner={lobby.Owner.Id.Value}, MemberCount={lobby.MemberCount}");
+
+        if (lobby.GetData("gameStarted") == "true")
         {
             Debug.LogWarning("[LobbyService] gameStarted == true, leaving");
-            result.Value.Leave();
+            lobby.Leave();
             OnGameAlreadyStarted?.Invoke();
             return;
         }
 
-        var owner = result.Value.Owner;
+        ulong hostId = lobby.Owner.Id.Value;
 
-        if (owner.Id.Value == 0)
+        if (hostId == 0)
         {
             Debug.LogWarning("[LobbyService] owner.Id.Value == 0 — invalid owner, leaving");
-            result.Value.Leave();
+            lobby.Leave();
             OnJoinFailed?.Invoke();
             return;
         }
 
-        var members = result.Value.Members.ToArray();
-        Debug.Log($"[LobbyService] Members count = {members.Length}");
+        bool hostStillPresent = lobby.Members.Any(m => m.Id.Value == hostId);
 
-        //if (members.Length <= 1)
-        //{
-        //    Debug.LogWarning("[LobbyService] members.Length <= 1 — leaving");
-        //    result.Value.Leave();
-        //    OnJoinFailed?.Invoke();
-        //    return;
-        //}
+        if (!hostStillPresent)
+        {
+            Debug.LogWarning("[LobbyService] Host not found among current members — stale lobby, leaving");
+            lobby.Leave();
+            OnJoinFailed?.Invoke();
+            return;
+        }
 
-        CurrentLobby = result.Value;
+        CurrentLobby = lobby;
         IsHost = false;
-        Debug.Log("[LobbyService] JoinLobby successful");
         OnLobbyJoined?.Invoke();
     }
 
@@ -133,8 +131,10 @@ public class LobbyService : MonoBehaviour
 
     public void CloseLobby()
     {
-        if (!IsHost) 
+        if (!IsHost)
             return;
+
+        Debug.Log($"[LobbyService] CloseLobby — locking room, Id={CurrentLobby.Id.Value}");
 
         CurrentLobby.SetData("gameStarted", "true");
         CurrentLobby.SetJoinable(false);
@@ -155,7 +155,7 @@ public class LobbyService : MonoBehaviour
     {
         OnMemberLeft?.Invoke(friend);
 
-        if (IsHost) 
+        if (IsHost)
             return;
 
         if (friend.Id.Value == GetHostSteamId())

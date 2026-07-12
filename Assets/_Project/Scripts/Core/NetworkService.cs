@@ -57,8 +57,9 @@ public class NetworkService : MonoBehaviour
     public void StartHost()
     {
         bool local = PlayerPrefs.GetInt("UseLocalTransport", 0) == 1;
-        _multipass.SetClientTransport(local ? (Transport)_networkManager.TransportManager.GetTransport<Tugboat>() : _transport);
+        Debug.Log($"[NetworkService] StartHost, transport = {(local ? "Tugboat" : "FishyFacepunch")}");
 
+        _multipass.SetClientTransport(local ? (Transport)_networkManager.TransportManager.GetTransport<Tugboat>() : _transport);
         _networkManager.ServerManager.StartConnection();
         _networkManager.ClientManager.StartConnection();
         _connectionStarted = true;
@@ -140,6 +141,9 @@ public class NetworkService : MonoBehaviour
 
     private void OnFadeInReceived(FadeInMessage msg, Channel channel)
     {
+        if (InstanceFinder.IsServerStarted) 
+            return;
+
         ScreenFader.Instance.FadeIn();
     }
 

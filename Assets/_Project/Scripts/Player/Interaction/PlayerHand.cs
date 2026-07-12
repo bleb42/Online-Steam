@@ -19,30 +19,6 @@ public class PlayerHand : NetworkBehaviour
 
     private bool _isAiming;
 
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-
-        if (!IsOwner) 
-            return;
-
-        _inputReader.OnThrowStarted += StartAim;
-        _inputReader.OnThrowPerformed += Throw;
-        _inputReader.OnDropPerformed += Drop;
-    }
-
-    public override void OnStopClient()
-    {
-        base.OnStopClient();
-
-        if (_inputReader == null) 
-            return;
-
-        _inputReader.OnThrowStarted -= StartAim;
-        _inputReader.OnThrowPerformed -= Throw;
-        _inputReader.OnDropPerformed -= Drop;
-    }
-
     private void Update()
     {
         if (!IsOwner || !_isAiming || HeldItem == null)
@@ -57,13 +33,37 @@ public class PlayerHand : NetworkBehaviour
         _trajectoryPredictor.ShowTrajectory(item.transform.position, direction * _throwForce);
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        if (!IsOwner)
+            return;
+
+        _inputReader.OnThrowStarted += StartAim;
+        _inputReader.OnThrowPerformed += Throw;
+        _inputReader.OnDropPerformed += Drop;
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+
+        if (_inputReader == null)
+            return;
+
+        _inputReader.OnThrowStarted -= StartAim;
+        _inputReader.OnThrowPerformed -= Throw;
+        _inputReader.OnDropPerformed -= Drop;
+    }
+
     public void Hold(ITakeable item)
     {
         HeldItem = item;
         _animatorAdapter.SetHolding(true);
     }
 
-    private void Clear()
+    public void Clear()
     {
         HeldItem = null;
         _animatorAdapter.SetHolding(false);
@@ -71,7 +71,7 @@ public class PlayerHand : NetworkBehaviour
 
     private void StartAim()
     {
-        if (HeldItem == null) 
+        if (HeldItem == null)
             return;
 
         _isAiming = true;
@@ -81,7 +81,7 @@ public class PlayerHand : NetworkBehaviour
     {
         _isAiming = false;
 
-        if (HeldItem == null) 
+        if (HeldItem == null)
             return;
 
         _trajectoryPredictor.HideTrajectory();
@@ -96,7 +96,7 @@ public class PlayerHand : NetworkBehaviour
     {
         _isAiming = false;
 
-        if (HeldItem == null) 
+        if (HeldItem == null)
             return;
 
         _trajectoryPredictor.HideTrajectory();

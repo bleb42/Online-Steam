@@ -28,6 +28,11 @@ public class LobbyPanel : MenuPanel
         OnStartGameClicked?.Invoke();
     }
 
+    public void SetStartButtonInteractable(bool interactable)
+    {
+        _btnStartGame.interactable = interactable;
+    }
+
     public void ShowStartButton(bool show) => _btnStartGame.gameObject.SetActive(show);
 
     public void SetLobbyId(string id) => _lobbyIdText.text = id;

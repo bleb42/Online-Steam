@@ -41,16 +41,18 @@ public class MenuFlowController : MonoBehaviour
         LobbyService.Instance.OnLobbyCreated += HandleLobbyCreated;
         LobbyService.Instance.OnLobbyJoined += HandleLobbyJoined;
         LobbyService.Instance.OnLobbyLeft += HandleLobbyLeft;
-        LobbyService.Instance.OnMemberJoined += _ => RefreshPlayersList();
-        LobbyService.Instance.OnMemberLeft += _ => RefreshPlayersList();
+        LobbyService.Instance.OnMemberJoined += _ => { RefreshPlayersList(); UpdateStartButtonState(); };
+        LobbyService.Instance.OnMemberLeft += _ => { RefreshPlayersList(); UpdateStartButtonState(); };
         LobbyService.Instance.OnJoinFailed += HandleJoinFailed;
         LobbyService.Instance.OnHostLeft += HandleHostLeft;
         LobbyService.Instance.OnGameAlreadyStarted += HandleGameAlreadyStarted;
+
+        NetworkService.Instance.OnClientCountChanged += _ => UpdateStartButtonState();
     }
 
     private void OnDestroy()
     {
-        if (LobbyService.Instance == null) 
+        if (LobbyService.Instance == null)
             return;
 
         LobbyService.Instance.OnLobbyCreated -= HandleLobbyCreated;
@@ -59,6 +61,20 @@ public class MenuFlowController : MonoBehaviour
         LobbyService.Instance.OnJoinFailed -= HandleJoinFailed;
         LobbyService.Instance.OnHostLeft -= HandleHostLeft;
         LobbyService.Instance.OnGameAlreadyStarted -= HandleGameAlreadyStarted;
+
+        if (NetworkService.Instance != null)
+            NetworkService.Instance.OnClientCountChanged -= _ => UpdateStartButtonState();
+    }
+
+    private void UpdateStartButtonState()
+    {
+        if (!LobbyService.Instance.IsHost)
+            return;
+
+        int expected = LobbyService.Instance.CurrentLobby.MemberCount;
+        int connected = NetworkService.Instance.GetConnectedClientCount();
+
+        _lobby.SetStartButtonInteractable(connected >= expected);
     }
 
     private async void HandleCreateClicked()
@@ -93,6 +109,7 @@ public class MenuFlowController : MonoBehaviour
         RefreshPlayersList();
 
         NetworkService.Instance.StartHost();
+        UpdateStartButtonState();
     }
 
     private void HandleLobbyJoined()

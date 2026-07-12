@@ -13,6 +13,7 @@ public class NetworkService : MonoBehaviour
 
     public event Action OnConnected;
     public event Action OnDisconnected;
+    public event Action<int> OnClientCountChanged;
 
     private NetworkManager _networkManager;
     private Transport _transport;
@@ -40,6 +41,7 @@ public class NetworkService : MonoBehaviour
         _networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
         _networkManager.ClientManager.RegisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
         _networkManager.ClientManager.RegisterBroadcast<FadeInMessage>(OnFadeInReceived);
+        _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
     }
 
     private void OnDisable()
@@ -47,7 +49,10 @@ public class NetworkService : MonoBehaviour
         _networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
         _networkManager.ClientManager.UnregisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
         _networkManager.ClientManager.UnregisterBroadcast<FadeInMessage>(OnFadeInReceived);
+        _networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
     }
+
+    public int GetConnectedClientCount() => _networkManager.ServerManager.Clients.Count;
 
     public void StartHost()
     {
@@ -89,7 +94,7 @@ public class NetworkService : MonoBehaviour
 
     public void BeginGameStart(string sceneName)
     {
-        _networkManager.ServerManager.Broadcast(new FadeInMessage());
+        _networkManager.ServerManager.Broadcast(new FadeInMessage(), true, Channel.Reliable);
 
         ScreenFader.Instance.FadeIn(() =>
         {
@@ -99,6 +104,13 @@ public class NetworkService : MonoBehaviour
             data.ReplaceScenes = ReplaceOption.All;
             _networkManager.SceneManager.LoadGlobalScenes(data);
         });
+    }
+
+    public void FinishGameStart()
+    {
+        Debug.Log("[NetworkService] FinishGameStart called - broadcasting FadeOut");
+        _networkManager.ServerManager.Broadcast(new FadeOutMessage(), true, Channel.Reliable);
+        Debug.Log("[NetworkService] FadeOut broadcast sent");
     }
 
     private void OnClientConnectionState(ClientConnectionStateArgs args)
@@ -131,11 +143,10 @@ public class NetworkService : MonoBehaviour
         ScreenFader.Instance.FadeIn();
     }
 
-    public void FinishGameStart()
+
+    private void OnRemoteConnectionState(FishNet.Connection.NetworkConnection conn, RemoteConnectionStateArgs args)
     {
-        Debug.Log("[NetworkService] FinishGameStart called - broadcasting FadeOut");
-        _networkManager.ServerManager.Broadcast(new FadeOutMessage());
-        Debug.Log("[NetworkService] FadeOut broadcast sent");
+        OnClientCountChanged?.Invoke(_networkManager.ServerManager.Clients.Count);
     }
 }
 

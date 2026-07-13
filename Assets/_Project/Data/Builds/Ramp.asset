@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beccdd342da253347a549d4e1321fa5f, type: 3}
+  m_Name: Ramp
+  m_EditorClassIdentifier: Assembly-CSharp::BuildPieceDefinition
+  PieceName: Ramp
+  Prefab: {fileID: 6377108713969500600, guid: bac240428c6c6004ba45ec3c42cad8b1, type: 3}
+  GhostPrefab: {fileID: 6377108713969500600, guid: 9a2c41a2f78cb3b4392fe6a8037832f9, type: 3}
+  ToolType: 2

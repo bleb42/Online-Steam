@@ -419,8 +419,8 @@ GameObject:
   - component: {fileID: 2023589240}
   - component: {fileID: 2023589246}
   - component: {fileID: 2023589245}
-  - component: {fileID: 2023589244}
   - component: {fileID: 2023589249}
+  - component: {fileID: 2023589250}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -474,18 +474,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2023589244
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2023589239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2fce94c688928542957e5268031c4a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TransportSwitcher
 --- !u!114 &2023589245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,8 +527,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Transporting.Multipass.Multipass
   GlobalServerActions: 1
   _transports:
-  - {fileID: 2023589245}
   - {fileID: 2023589246}
+  - {fileID: 2023589245}
 --- !u!114 &2023589249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -561,6 +549,18 @@ MonoBehaviour:
   _maximumTimedObserversDuration: 10
   _defaultConditions:
   - {fileID: 11400000, guid: 35f5513a403985e4bb0cc68cf60c34ca, type: 2}
+--- !u!114 &2023589250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2023589239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2fce94c688928542957e5268031c4a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TransportSwitcher
 --- !u!1 &2032480572
 GameObject:
   m_ObjectHideFlags: 0

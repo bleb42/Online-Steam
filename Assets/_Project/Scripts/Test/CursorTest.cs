@@ -7,7 +7,7 @@ public class CursorTest : MonoBehaviour
     {
         var keyboard = Keyboard.current;
 
-        if (keyboard != null && keyboard[Key.N].wasPressedThisFrame)
+        if(keyboard != null && keyboard[Key.N].wasPressedThisFrame)
         {
             Cursor.visible = !Cursor.visible;
 

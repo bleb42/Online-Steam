@@ -360,7 +360,7 @@ MonoBehaviour:
       type: {class: URPDefaultVolumeProfileSettings, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         m_Version: 0
-        m_VolumeProfile: {fileID: 11400000, guid: f73f90b43fe7226449b83e4e6f5ac964, type: 2}
+        m_VolumeProfile: {fileID: 11400000, guid: f76c3ce7685f2e7438b257c750233c78, type: 2}
     - rid: 6852985685364965385
       type: {class: RenderGraphSettings, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:

@@ -9,7 +9,6 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     public float MovementInputDuration { get; set; }
     public bool MovementInputDetected { get; private set; }
 
-
     public event Action OnCrouchActivated;
     public event Action OnCrouchDeactivated;
     public event Action OnJumpPerformed;
@@ -19,11 +18,14 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     public event Action OnThrowStarted;
     public event Action OnThrowPerformed;
     public event Action OnDropPerformed;
-
     public event Action OnWalkToggled;
 
-    private Controls _controls;
+    public event Action OnBuildTogglePerformed;
+    public event Action OnBuildSlot1Performed;
+    public event Action OnBuildSlot2Performed;
+    public event Action OnBuildSlot3Performed;
 
+    private Controls _controls;
 
     private void OnEnable()
     {
@@ -32,7 +34,6 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
             _controls = new Controls();
             _controls.Player.SetCallbacks(this);
         }
-
         _controls.Player.Enable();
     }
 
@@ -55,9 +56,7 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     public void OnJump(InputAction.CallbackContext context)
     {
         if (!context.performed)
-        {
             return;
-        }
 
         OnJumpPerformed?.Invoke();
     }
@@ -65,9 +64,7 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     public void OnToggleWalk(InputAction.CallbackContext context)
     {
         if (!context.performed)
-        {
             return;
-        }
 
         OnWalkToggled?.Invoke();
     }
@@ -98,7 +95,7 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (!context.performed) 
+        if (!context.performed)
             return;
 
         OnInteractPerformed?.Invoke();
@@ -117,7 +114,38 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     {
         if (!context.performed)
             return;
-
         OnDropPerformed?.Invoke();
+    }
+
+    public void OnBuildToggle(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        OnBuildTogglePerformed?.Invoke();
+    }
+
+    public void OnBuildSlot1(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        OnBuildSlot1Performed?.Invoke();
+    }
+
+    public void OnBuildSlot2(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        OnBuildSlot2Performed?.Invoke();
+    }
+
+    public void OnBuildSlot3(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        OnBuildSlot3Performed?.Invoke();
     }
 }

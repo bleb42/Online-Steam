@@ -1888,7 +1888,7 @@ CharacterController:
   serializedVersion: 3
   m_Height: 1.7
   m_Radius: 0.28
-  m_SlopeLimit: 45
+  m_SlopeLimit: 46
   m_StepOffset: 0.25
   m_SkinWidth: 0.02
   m_MinMoveDistance: 0.001
@@ -1972,7 +1972,7 @@ MonoBehaviour:
   _frontRayPos: {fileID: 5786604110661587886}
   _groundLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 769
   _groundedOffset: -0.14
   _capsuleStandingHeight: 1.8
 --- !u!114 &2125134132630251753
@@ -2233,7 +2233,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 3
+  <PrefabId>k__BackingField: 6
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 9102136336549233153
   SceneId: 0
@@ -2264,7 +2264,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584177814505359814
+  _initializedTimestamp: -8584177114266508988
 --- !u!1 &5788723386511180224
 GameObject:
   m_ObjectHideFlags: 0
@@ -2501,6 +2501,7 @@ GameObject:
   - component: {fileID: 7911114645354073867}
   - component: {fileID: 3343039472771200025}
   - component: {fileID: 1134697106566152999}
+  - component: {fileID: 6452850211008443110}
   m_Layer: 0
   m_Name: PlayerHand
   m_TagString: Untagged
@@ -2545,6 +2546,7 @@ MonoBehaviour:
   _holdPoint: {fileID: 8562619798995266459}
   _throwAngleUp: 35
   _throwForce: 12
+  _playerBuilder: {fileID: 6452850211008443110}
 --- !u!114 &3343039472771200025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2670,6 +2672,31 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &6452850211008443110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6237899319509386656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8814be720b08746a5a1d0bd5bd3f18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBuilder
+  _inputReader: {fileID: 5466497497293957071}
+  _camera: {fileID: 4845906833448507656}
+  _pieces:
+  - {fileID: 11400000, guid: e72c5635c1452c24da35dc72e45b32d9, type: 2}
+  - {fileID: 11400000, guid: 19b47162ea9aa3c449aa1c51099757fb, type: 2}
+  - {fileID: 11400000, guid: 27b4e0f48a1d07d45b3111342fcf153d, type: 2}
+  _aimMask:
+    serializedVersion: 2
+    m_Bits: 769
+  _cellSize: 2
+  _cellHeight: 2
+  _maxBuildDistance: 4
+  _maxReachFromPlayer: 6
 --- !u!1 &6290256649169373014
 GameObject:
   m_ObjectHideFlags: 0

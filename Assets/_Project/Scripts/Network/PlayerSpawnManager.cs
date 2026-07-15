@@ -6,17 +6,28 @@ using UnityEngine;
 
 public class PlayerSpawnManager : MonoBehaviour
 {
-    public static PlayerSpawnManager Instance { get; private set; }
-
     [SerializeField] private NetworkObject _playerPrefab;
     [SerializeField] private Transform[] _spawnPoints;
 
     private int _expectedPlayers;
     private int _readyPlayers;
 
-    private void Awake()
+    private void OnEnable()
     {
-        Instance = this;
+        if (NetworkService.Instance != null)
+        {
+            NetworkService.Instance.OnGameSceneReadyToSpawn += SpawnAllPlayers;
+            NetworkService.Instance.OnPlayerReadyOnServer += NotifyPlayerReady;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (NetworkService.Instance != null)
+        {
+            NetworkService.Instance.OnGameSceneReadyToSpawn -= SpawnAllPlayers;
+            NetworkService.Instance.OnPlayerReadyOnServer -= NotifyPlayerReady;
+        }
     }
 
     public void SpawnAllPlayers(IEnumerable<NetworkConnection> connections)
@@ -44,13 +55,9 @@ public class PlayerSpawnManager : MonoBehaviour
         if (_readyPlayers >= _expectedPlayers)
         {
             if (NetworkService.Instance != null)
-            {
                 NetworkService.Instance.FinishGameStart();
-            }
             else
-            {
                 Debug.Log("[PlayerSpawnManager] NetworkService not present (debug scene) — skipping fade out.");
-            }
         }
     }
 }

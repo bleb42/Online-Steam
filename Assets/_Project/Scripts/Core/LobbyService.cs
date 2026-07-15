@@ -5,9 +5,8 @@ using Steamworks;
 using Steamworks.Data;
 using UnityEngine;
 
-public class LobbyService : MonoBehaviour
+public class LobbyService : PersistentSingleton<LobbyService>
 {
-    public static LobbyService Instance { get; private set; }
     public Lobby CurrentLobby { get; private set; }
     public bool IsHost { get; private set; }
 
@@ -20,18 +19,6 @@ public class LobbyService : MonoBehaviour
     public event Action OnHostLeft;
     public event Action OnGameAlreadyStarted;
     public event Action OnGameStarted;
-
-    private void Awake()
-    {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     private void OnEnable()
     {
@@ -83,7 +70,6 @@ public class LobbyService : MonoBehaviour
         }
 
         Lobby lobby = result.Value;
-
         Debug.Log($"[LobbyService] Joined lobby, Id={lobby.Id.Value}, Owner={lobby.Owner.Id.Value}, MemberCount={lobby.MemberCount}");
 
         if (lobby.GetData("gameStarted") == "true")

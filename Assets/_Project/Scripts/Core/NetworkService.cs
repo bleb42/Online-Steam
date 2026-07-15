@@ -1,39 +1,36 @@
 using System;
+using System.Collections.Generic;
 using FishNet;
+using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
-using FishNet.Transporting.Multipass;
-using FishNet.Transporting.Tugboat;
 using UnityEngine;
 
-public class NetworkService : MonoBehaviour
+public class NetworkService : PersistentSingleton<NetworkService>
 {
-    public static NetworkService Instance { get; private set; }
-
     public event Action OnConnected;
     public event Action OnDisconnected;
     public event Action<int> OnClientCountChanged;
+    public event Action<IEnumerable<NetworkConnection>> OnGameSceneReadyToSpawn;
+    public event Action OnPlayerReadyOnServer;
 
     private NetworkManager _networkManager;
     private Transport _transport;
-    private Multipass _multipass;
 
     private bool _connectionStarted;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake();
 
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
         _networkManager = InstanceFinder.NetworkManager;
         _transport = _networkManager.TransportManager.GetTransport<FishyFacepunch.FishyFacepunch>();
-        _multipass = _networkManager.TransportManager.GetTransport<Multipass>();
+
+        Debug.Log($"Steam initialized: {Steamworks.SteamClient.IsValid}");
+
+        if (Steamworks.SteamClient.IsValid)
+            Debug.Log($"SteamId: {Steamworks.SteamClient.SteamId}");
     }
 
     private void OnEnable()
@@ -42,6 +39,9 @@ public class NetworkService : MonoBehaviour
         _networkManager.ClientManager.RegisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
         _networkManager.ClientManager.RegisterBroadcast<FadeInMessage>(OnFadeInReceived);
         _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+
+        _networkManager.ServerManager.OnServerConnectionState += OnServerConnectionStateLog;
+        _networkManager.ClientManager.OnClientConnectionState += OnClientConnectionStateLog;
     }
 
     private void OnDisable()
@@ -50,37 +50,30 @@ public class NetworkService : MonoBehaviour
         _networkManager.ClientManager.UnregisterBroadcast<FadeOutMessage>(OnFadeOutReceived);
         _networkManager.ClientManager.UnregisterBroadcast<FadeInMessage>(OnFadeInReceived);
         _networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
+
+        _networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionStateLog;
+        _networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionStateLog;
     }
 
     public int GetConnectedClientCount() => _networkManager.ServerManager.Clients.Count;
 
     public void StartHost()
     {
-        bool local = PlayerPrefs.GetInt("UseLocalTransport", 0) == 1;
-        Debug.Log($"[NetworkService] StartHost, transport = {(local ? "Tugboat" : "FishyFacepunch")}");
+        Debug.Log("[NetworkService] StartHost, transport = FishyFacepunch");
 
-        _multipass.SetClientTransport(local ? (Transport)_networkManager.TransportManager.GetTransport<Tugboat>() : _transport);
         _networkManager.ServerManager.StartConnection();
         _networkManager.ClientManager.StartConnection();
+
         _connectionStarted = true;
     }
 
-
     public void StartClient(ulong hostSteamId)
     {
-        bool local = PlayerPrefs.GetInt("UseLocalTransport", 0) == 1;
+        Debug.Log($"[NetworkService] StartClient SteamId={hostSteamId}");
 
-        if (local)
-        {
-            _multipass.SetClientTransport<Tugboat>();
-        }
-        else
-        {
-            _multipass.SetClientTransport<FishyFacepunch.FishyFacepunch>();
-            _transport.SetClientAddress(hostSteamId.ToString());
-        }
-
+        _transport.SetClientAddress(hostSteamId.ToString());
         _networkManager.ClientManager.StartConnection();
+
         _connectionStarted = true;
     }
 
@@ -107,6 +100,11 @@ public class NetworkService : MonoBehaviour
         });
     }
 
+    public void NotifyPlayerReady()
+    {
+        OnPlayerReadyOnServer?.Invoke();
+    }
+
     public void FinishGameStart()
     {
         Debug.Log("[NetworkService] FinishGameStart called - broadcasting FadeOut");
@@ -130,7 +128,7 @@ public class NetworkService : MonoBehaviour
 
         _networkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
 
-        PlayerSpawnManager.Instance.SpawnAllPlayers(_networkManager.ServerManager.Clients.Values);
+        OnGameSceneReadyToSpawn?.Invoke(_networkManager.ServerManager.Clients.Values);
     }
 
     private void OnFadeOutReceived(FadeOutMessage msg, Channel channel)
@@ -141,16 +139,25 @@ public class NetworkService : MonoBehaviour
 
     private void OnFadeInReceived(FadeInMessage msg, Channel channel)
     {
-        if (InstanceFinder.IsServerStarted) 
+        if (InstanceFinder.IsServerStarted)
             return;
 
         ScreenFader.Instance.FadeIn();
     }
 
-
     private void OnRemoteConnectionState(FishNet.Connection.NetworkConnection conn, RemoteConnectionStateArgs args)
     {
         OnClientCountChanged?.Invoke(_networkManager.ServerManager.Clients.Count);
+    }
+
+    private void OnServerConnectionStateLog(ServerConnectionStateArgs args)
+    {
+        Debug.Log($"[Server] state={args.ConnectionState}");
+    }
+
+    private void OnClientConnectionStateLog(ClientConnectionStateArgs args)
+    {
+        Debug.Log($"[Client] state={args.ConnectionState}");
     }
 }
 

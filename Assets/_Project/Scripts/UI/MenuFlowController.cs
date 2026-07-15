@@ -1,3 +1,5 @@
+using Steamworks;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -14,6 +16,9 @@ public class MenuFlowController : MonoBehaviour
     [SerializeField] private LoadingPanel _loading;
     [SerializeField] private MessagePanel _message;
     [SerializeField] private SettingsPanel _settings;
+
+    private event Action<Friend> _onMemberChanged;
+    private event Action<int> _onClientCountChanged;
 
     private void Awake()
     {
@@ -38,32 +43,37 @@ public class MenuFlowController : MonoBehaviour
 
     private void Start()
     {
+        _onMemberChanged = _ => { RefreshPlayersList(); UpdateStartButtonState(); };
+        _onClientCountChanged = _ => UpdateStartButtonState();
+
         LobbyService.Instance.OnLobbyCreated += HandleLobbyCreated;
         LobbyService.Instance.OnLobbyJoined += HandleLobbyJoined;
         LobbyService.Instance.OnLobbyLeft += HandleLobbyLeft;
-        LobbyService.Instance.OnMemberJoined += _ => { RefreshPlayersList(); UpdateStartButtonState(); };
-        LobbyService.Instance.OnMemberLeft += _ => { RefreshPlayersList(); UpdateStartButtonState(); };
+        LobbyService.Instance.OnMemberJoined += _onMemberChanged;
+        LobbyService.Instance.OnMemberLeft += _onMemberChanged;
         LobbyService.Instance.OnJoinFailed += HandleJoinFailed;
         LobbyService.Instance.OnHostLeft += HandleHostLeft;
         LobbyService.Instance.OnGameAlreadyStarted += HandleGameAlreadyStarted;
 
-        NetworkService.Instance.OnClientCountChanged += _ => UpdateStartButtonState();
+        NetworkService.Instance.OnClientCountChanged += _onClientCountChanged;
     }
 
     private void OnDestroy()
     {
-        if (LobbyService.Instance == null)
-            return;
-
-        LobbyService.Instance.OnLobbyCreated -= HandleLobbyCreated;
-        LobbyService.Instance.OnLobbyJoined -= HandleLobbyJoined;
-        LobbyService.Instance.OnLobbyLeft -= HandleLobbyLeft;
-        LobbyService.Instance.OnJoinFailed -= HandleJoinFailed;
-        LobbyService.Instance.OnHostLeft -= HandleHostLeft;
-        LobbyService.Instance.OnGameAlreadyStarted -= HandleGameAlreadyStarted;
+        if (LobbyService.Instance != null)
+        {
+            LobbyService.Instance.OnLobbyCreated -= HandleLobbyCreated;
+            LobbyService.Instance.OnLobbyJoined -= HandleLobbyJoined;
+            LobbyService.Instance.OnLobbyLeft -= HandleLobbyLeft;
+            LobbyService.Instance.OnMemberJoined -= _onMemberChanged;
+            LobbyService.Instance.OnMemberLeft -= _onMemberChanged;
+            LobbyService.Instance.OnJoinFailed -= HandleJoinFailed;
+            LobbyService.Instance.OnHostLeft -= HandleHostLeft;
+            LobbyService.Instance.OnGameAlreadyStarted -= HandleGameAlreadyStarted;
+        }
 
         if (NetworkService.Instance != null)
-            NetworkService.Instance.OnClientCountChanged -= _ => UpdateStartButtonState();
+            NetworkService.Instance.OnClientCountChanged -= _onClientCountChanged;
     }
 
     private void UpdateStartButtonState()

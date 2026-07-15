@@ -172,42 +172,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""BuildToggle"",
-                    ""type"": ""Button"",
-                    ""id"": ""92ef0587-dd39-4b78-8b20-afa1748dbd23"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""BuildSlot1"",
-                    ""type"": ""Button"",
-                    ""id"": ""cd59a58e-3875-48c2-9b9a-b7377967721e"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""BuildSlot2"",
-                    ""type"": ""Button"",
-                    ""id"": ""674ee3e2-8024-452e-b570-0c401df7e573"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""BuildSlot3"",
-                    ""type"": ""Button"",
-                    ""id"": ""2340daa5-530c-482f-bda9-236d1ad692b0"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -474,50 +438,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Drop"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""3b1855bb-ca8a-43e2-9867-f8d2c11d4678"",
-                    ""path"": ""<Keyboard>/f"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""BuildToggle"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""984e43b6-2458-40d1-808d-39b5391e9238"",
-                    ""path"": ""<Keyboard>/1"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""BuildSlot1"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4333e8ff-26a7-4cf8-a83b-c399be0fce09"",
-                    ""path"": ""<Keyboard>/2"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""BuildSlot2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""f531f04c-956a-453c-b6b1-e8d81cc789e8"",
-                    ""path"": ""<Keyboard>/3"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""BuildSlot3"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -563,10 +483,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Throw = m_Player.FindAction("Throw", throwIfNotFound: true);
         m_Player_Drop = m_Player.FindAction("Drop", throwIfNotFound: true);
-        m_Player_BuildToggle = m_Player.FindAction("BuildToggle", throwIfNotFound: true);
-        m_Player_BuildSlot1 = m_Player.FindAction("BuildSlot1", throwIfNotFound: true);
-        m_Player_BuildSlot2 = m_Player.FindAction("BuildSlot2", throwIfNotFound: true);
-        m_Player_BuildSlot3 = m_Player.FindAction("BuildSlot3", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -656,10 +572,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_Throw;
     private readonly InputAction m_Player_Drop;
-    private readonly InputAction m_Player_BuildToggle;
-    private readonly InputAction m_Player_BuildSlot1;
-    private readonly InputAction m_Player_BuildSlot2;
-    private readonly InputAction m_Player_BuildSlot3;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -707,22 +619,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Drop".
         /// </summary>
         public InputAction @Drop => m_Wrapper.m_Player_Drop;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/BuildToggle".
-        /// </summary>
-        public InputAction @BuildToggle => m_Wrapper.m_Player_BuildToggle;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/BuildSlot1".
-        /// </summary>
-        public InputAction @BuildSlot1 => m_Wrapper.m_Player_BuildSlot1;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/BuildSlot2".
-        /// </summary>
-        public InputAction @BuildSlot2 => m_Wrapper.m_Player_BuildSlot2;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/BuildSlot3".
-        /// </summary>
-        public InputAction @BuildSlot3 => m_Wrapper.m_Player_BuildSlot3;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -776,18 +672,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Drop.started += instance.OnDrop;
             @Drop.performed += instance.OnDrop;
             @Drop.canceled += instance.OnDrop;
-            @BuildToggle.started += instance.OnBuildToggle;
-            @BuildToggle.performed += instance.OnBuildToggle;
-            @BuildToggle.canceled += instance.OnBuildToggle;
-            @BuildSlot1.started += instance.OnBuildSlot1;
-            @BuildSlot1.performed += instance.OnBuildSlot1;
-            @BuildSlot1.canceled += instance.OnBuildSlot1;
-            @BuildSlot2.started += instance.OnBuildSlot2;
-            @BuildSlot2.performed += instance.OnBuildSlot2;
-            @BuildSlot2.canceled += instance.OnBuildSlot2;
-            @BuildSlot3.started += instance.OnBuildSlot3;
-            @BuildSlot3.performed += instance.OnBuildSlot3;
-            @BuildSlot3.canceled += instance.OnBuildSlot3;
         }
 
         /// <summary>
@@ -826,18 +710,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Drop.started -= instance.OnDrop;
             @Drop.performed -= instance.OnDrop;
             @Drop.canceled -= instance.OnDrop;
-            @BuildToggle.started -= instance.OnBuildToggle;
-            @BuildToggle.performed -= instance.OnBuildToggle;
-            @BuildToggle.canceled -= instance.OnBuildToggle;
-            @BuildSlot1.started -= instance.OnBuildSlot1;
-            @BuildSlot1.performed -= instance.OnBuildSlot1;
-            @BuildSlot1.canceled -= instance.OnBuildSlot1;
-            @BuildSlot2.started -= instance.OnBuildSlot2;
-            @BuildSlot2.performed -= instance.OnBuildSlot2;
-            @BuildSlot2.canceled -= instance.OnBuildSlot2;
-            @BuildSlot3.started -= instance.OnBuildSlot3;
-            @BuildSlot3.performed -= instance.OnBuildSlot3;
-            @BuildSlot3.canceled -= instance.OnBuildSlot3;
         }
 
         /// <summary>
@@ -967,33 +839,5 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDrop(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "BuildToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnBuildToggle(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "BuildSlot1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnBuildSlot1(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "BuildSlot2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnBuildSlot2(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "BuildSlot3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnBuildSlot3(InputAction.CallbackContext context);
     }
 }

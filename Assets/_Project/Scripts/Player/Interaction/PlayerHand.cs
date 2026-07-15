@@ -10,7 +10,6 @@ public class PlayerHand : NetworkBehaviour
     [SerializeField] private Transform _holdPoint;
     [SerializeField] private float _throwAngleUp = 15f;
     [SerializeField] private float _throwForce = 10f;
-    [SerializeField] private PlayerBuilder _playerBuilder; // NEW
 
     public ITakeable HeldItem { get; private set; }
     public Transform HoldPoint => _holdPoint;
@@ -19,7 +18,6 @@ public class PlayerHand : NetworkBehaviour
     public bool IsAiming => _isAiming;
 
     private bool _isAiming;
-    private bool _isBuilding => _playerBuilder != null && _playerBuilder.IsBuildModeActive;
 
     private void Update()
     {
@@ -71,9 +69,6 @@ public class PlayerHand : NetworkBehaviour
 
     private void StartAim()
     {
-        if (_isBuilding)
-            return;
-
         if (HeldItem == null)
             return;
 
@@ -82,9 +77,6 @@ public class PlayerHand : NetworkBehaviour
 
     private void Throw()
     {
-        if (_isBuilding)
-            return;
-
         _isAiming = false;
 
         if (HeldItem == null)
@@ -98,9 +90,6 @@ public class PlayerHand : NetworkBehaviour
 
     private void Drop()
     {
-        if (_isBuilding)
-            return;
-
         _isAiming = false;
 
         if (HeldItem == null)

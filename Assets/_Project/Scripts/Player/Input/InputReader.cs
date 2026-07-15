@@ -20,11 +20,6 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     public event Action OnDropPerformed;
     public event Action OnWalkToggled;
 
-    public event Action OnBuildTogglePerformed;
-    public event Action OnBuildSlot1Performed;
-    public event Action OnBuildSlot2Performed;
-    public event Action OnBuildSlot3Performed;
-
     private Controls _controls;
 
     private void OnEnable()
@@ -33,6 +28,12 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
         {
             _controls = new Controls();
             _controls.Player.SetCallbacks(this);
+
+            if (InputRebindService.Instance != null)
+            {
+                InputRebindService.Instance.LoadIntoAsset(_controls.asset);
+                InputRebindService.Instance.OnRebindsChanged += HandleRebindsChanged;
+            }
         }
         _controls.Player.Enable();
     }
@@ -40,6 +41,12 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
     public void OnDisable()
     {
         _controls.Player.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        if (InputRebindService.Instance != null)
+            InputRebindService.Instance.OnRebindsChanged -= HandleRebindsChanged;
     }
 
     public void OnLook(InputAction.CallbackContext context)
@@ -117,35 +124,9 @@ public class InputReader : MonoBehaviour, Controls.IPlayerActions
         OnDropPerformed?.Invoke();
     }
 
-    public void OnBuildToggle(InputAction.CallbackContext context)
+    private void HandleRebindsChanged()
     {
-        if (!context.performed)
-            return;
-
-        OnBuildTogglePerformed?.Invoke();
-    }
-
-    public void OnBuildSlot1(InputAction.CallbackContext context)
-    {
-        if (!context.performed)
-            return;
-
-        OnBuildSlot1Performed?.Invoke();
-    }
-
-    public void OnBuildSlot2(InputAction.CallbackContext context)
-    {
-        if (!context.performed)
-            return;
-
-        OnBuildSlot2Performed?.Invoke();
-    }
-
-    public void OnBuildSlot3(InputAction.CallbackContext context)
-    {
-        if (!context.performed)
-            return;
-
-        OnBuildSlot3Performed?.Invoke();
+        if (InputRebindService.Instance != null)
+            InputRebindService.Instance.LoadIntoAsset(_controls.asset);
     }
 }

@@ -32,13 +32,7 @@ public class PlayerNetworkSetup : NetworkBehaviour
     [ServerRpc]
     private void NotifyReadyServerRpc()
     {
-        if (PlayerSpawnManager.Instance != null)
-        {
-            PlayerSpawnManager.Instance.NotifyPlayerReady();
-        }
-        else
-        {
-            Debug.Log("[PlayerNetworkSetup] PlayerSpawnManager not present (debug scene) — skipping ready notification.");
-        }
+        if (NetworkService.Instance != null)
+            NetworkService.Instance.NotifyPlayerReady();
     }
 }

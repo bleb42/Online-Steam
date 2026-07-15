@@ -3,23 +3,14 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ScreenFader : MonoBehaviour
+public class ScreenFader : PersistentSingleton<ScreenFader>
 {
-    public static ScreenFader Instance { get; private set; }
-
     [SerializeField] private Image _image;
     [SerializeField] private float _duration = 0.5f;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        base.Awake();
 
         Color color = _image.color;
         color.a = 1f;

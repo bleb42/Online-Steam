@@ -12,9 +12,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private PlayerHand _playerHand;
 
     [Header("Camera Settings")]
-    [SerializeField] private bool _invertCamera;
     [SerializeField] private bool _hideCursor;
-    [SerializeField] private float _mouseSensitivity = 5f;
     [SerializeField] private float _cameraDistance = 2f;
     [SerializeField] private float _cameraHeightOffset;
     [SerializeField] private float _cameraHorizontalOffset;
@@ -39,6 +37,7 @@ public class CameraController : MonoBehaviour
     private Vector3 _lastPosition;
     private Vector3 _newPosition;
     private float _cameraInversion;
+    private float _mouseSensitivity;
     private float _lastAngleX;
     private float _lastAngleY;
     private float _newAngleX;
@@ -54,6 +53,11 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
+        ApplySettings();
+
+        if (GameSettingsService.Instance != null)
+            GameSettingsService.Instance.OnSettingsChanged += ApplySettings;
+
         _camera = gameObject.transform.GetChild(0);
 
         if (_hideCursor)
@@ -61,8 +65,6 @@ public class CameraController : MonoBehaviour
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
-
-        _cameraInversion = _invertCamera ? 1 : -1;
 
         transform.position = _playerTarget.position;
         transform.rotation = _playerTarget.rotation;
@@ -108,23 +110,42 @@ public class CameraController : MonoBehaviour
         _lastAngleY = _newAngleY;
     }
 
-    private void UpdateAimZoom()
+    private void OnDestroy()
     {
-        bool isAiming = _playerHand != null && !_playerHand.IsEmpty && _playerHand.IsAiming;
+        if (GameSettingsService.Instance != null)
+            GameSettingsService.Instance.OnSettingsChanged -= ApplySettings;
+    }
 
-        float targetDistance = isAiming ? _aimCameraDistance : _cameraDistance;
-        float targetHeight = isAiming ? _cameraHeightOffset + _aimHeightOffset : _cameraHeightOffset;
-        float targetHorizontal = isAiming ? _cameraHorizontalOffset + _aimHorizontalOffset : _cameraHorizontalOffset;
+    public Vector3 GetCameraForwardZeroedY()
+    {
+        return new Vector3(_mainCamera.transform.forward.x, 0, _mainCamera.transform.forward.z);
+    }
 
-        _currentCameraDistance = Mathf.Lerp(_currentCameraDistance, targetDistance, _aimTransitionSpeed * Time.deltaTime);
-        _currentHeightOffset = Mathf.Lerp(_currentHeightOffset, targetHeight, _aimTransitionSpeed * Time.deltaTime);
-        _currentHorizontalOffset = Mathf.Lerp(_currentHorizontalOffset, targetHorizontal, _aimTransitionSpeed * Time.deltaTime);
+    public Vector3 GetCameraForwardZeroedYNormalised()
+    {
+        return GetCameraForwardZeroedY().normalized;
+    }
 
-        if (_aimFovOffset != 0f)
-        {
-            float targetFov = isAiming ? _baseFov + _aimFovOffset : _baseFov;
-            _mainCamera.fieldOfView = Mathf.Lerp(_mainCamera.fieldOfView, targetFov, _aimTransitionSpeed * Time.deltaTime);
-        }
+    public Vector3 GetCameraRightZeroedY()
+    {
+        return new Vector3(_mainCamera.transform.right.x, 0, _mainCamera.transform.right.z);
+    }
+
+    public Vector3 GetCameraRightZeroedYNormalised()
+    {
+        return GetCameraRightZeroedY().normalized;
+    }
+
+    public float GetCameraTiltX()
+    {
+        return _mainCamera.transform.eulerAngles.x;
+    }
+
+    private void ApplySettings()
+    {
+        var settings = GameSettingsService.Instance.Current;
+        _mouseSensitivity = settings.MouseSensitivity;
+        _cameraInversion = settings.InvertCamera ? 1 : -1;
     }
 
     private void UpdateCameraCollision()
@@ -154,29 +175,22 @@ public class CameraController : MonoBehaviour
         _camera.position = transform.position + directionNormalised * actualDistance;
         _camera.localEulerAngles = new Vector3(_cameraTiltOffset, 0f, 0f);
     }
-
-    public Vector3 GetCameraForwardZeroedY()
+    private void UpdateAimZoom()
     {
-        return new Vector3(_mainCamera.transform.forward.x, 0, _mainCamera.transform.forward.z);
-    }
+        bool isAiming = _playerHand != null && !_playerHand.IsEmpty && _playerHand.IsAiming;
 
-    public Vector3 GetCameraForwardZeroedYNormalised()
-    {
-        return GetCameraForwardZeroedY().normalized;
-    }
+        float targetDistance = isAiming ? _aimCameraDistance : _cameraDistance;
+        float targetHeight = isAiming ? _cameraHeightOffset + _aimHeightOffset : _cameraHeightOffset;
+        float targetHorizontal = isAiming ? _cameraHorizontalOffset + _aimHorizontalOffset : _cameraHorizontalOffset;
 
-    public Vector3 GetCameraRightZeroedY()
-    {
-        return new Vector3(_mainCamera.transform.right.x, 0, _mainCamera.transform.right.z);
-    }
+        _currentCameraDistance = Mathf.Lerp(_currentCameraDistance, targetDistance, _aimTransitionSpeed * Time.deltaTime);
+        _currentHeightOffset = Mathf.Lerp(_currentHeightOffset, targetHeight, _aimTransitionSpeed * Time.deltaTime);
+        _currentHorizontalOffset = Mathf.Lerp(_currentHorizontalOffset, targetHorizontal, _aimTransitionSpeed * Time.deltaTime);
 
-    public Vector3 GetCameraRightZeroedYNormalised()
-    {
-        return GetCameraRightZeroedY().normalized;
-    }
-
-    public float GetCameraTiltX()
-    {
-        return _mainCamera.transform.eulerAngles.x;
+        if (_aimFovOffset != 0f)
+        {
+            float targetFov = isAiming ? _baseFov + _aimFovOffset : _baseFov;
+            _mainCamera.fieldOfView = Mathf.Lerp(_mainCamera.fieldOfView, targetFov, _aimTransitionSpeed * Time.deltaTime);
+        }
     }
 }
